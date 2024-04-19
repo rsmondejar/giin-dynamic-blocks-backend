@@ -2,21 +2,34 @@ version: '3.8'
 
 services:
   mongodb:
-    image: mongo:7
+    image: mongo:7.0.0
+    command: ["--replSet", "myReplicaSet", "--port", "27017", "--keyFile", "/etc/mongo/mongodb-keyfile"]
+
     environment:
       MONGO_INITDB_ROOT_USERNAME: "${DB_ROOT_USERNAME}"
       MONGO_INITDB_ROOT_PASSWORD: "${DB_ROOT_PASSWORD}"
     ports:
       - "${DB_PORT}:27017"
+#    extra_hosts:
+#      - "host.docker.internal:host-gateway"
+#    healthcheck:
+#      test: echo "try { rs.status() } catch (err) { rs.initiate({_id:'myReplicaSet',members:[{_id:0,host:'host.docker.internal:27017'}]}) }" | mongosh --port 27017 --quiet
+#      interval: 5s
+#      timeout: 30s
+#      start_period: 0s
+#      start_interval: 1s
+#      retries: 30
     volumes:
-      - ./.docker/data/mongodb/db:/data/db
+      - ./.docker/mongodb/db:/data/db
+      - ./.docker/mongodb/config:/etc/mongo
+      - ./mongodb-keyfile:/etc/mongo/mongodb-keyfile
 
-  mongo-express:
-    image: mongo-express
-    ports:
-      - "8081:8081"
-    environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: "${DB_ROOT_USERNAME}"
-      ME_CONFIG_MONGODB_ADMINPASSWORD: "${DB_ROOT_PASSWORD}"
-      ME_CONFIG_MONGODB_URL: "mongodb://${DB_ROOT_USERNAME}:${DB_ROOT_PASSWORD}@mongodb:${DB_PORT}/"
-      ME_CONFIG_BASICAUTH: false
+#  mongo-express:
+#    image: mongo-express
+#    ports:
+#      - "8081:8081"
+#    environment:
+#      ME_CONFIG_MONGODB_ADMINUSERNAME: "${DB_ROOT_USERNAME}"
+#      ME_CONFIG_MONGODB_ADMINPASSWORD: "${DB_ROOT_PASSWORD}"
+#      ME_CONFIG_MONGODB_URL: "mongodb://${DB_ROOT_USERNAME}:${DB_ROOT_PASSWORD}@mongodb:${DB_PORT}/?replicaSet=myReplicaSet"
+#      ME_CONFIG_BASICAUTH: false
