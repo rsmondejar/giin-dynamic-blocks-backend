@@ -13,13 +13,16 @@ export class UserEntity implements User {
   name: string;
 
   @ApiProperty()
-  lastName: string;
+  lastName: string | null;
 
   @Exclude()
   password: string;
 
   @ApiProperty()
   isActive: boolean;
+
+  @Exclude()
+  emailVerified: Date | null;
 
   @ApiProperty()
   createdAt: Date;

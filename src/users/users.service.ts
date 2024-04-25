@@ -1,4 +1,9 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -21,24 +26,28 @@ export class UsersService {
   /**
    * Create a new user
    * @param {CreateUserDto} createUserDto
-   * @returns {Promise<User>}
+   * @returns {Promise<UserBasicInfo>}
    */
-  async create(createUserDto: CreateUserDto): Promise<User> {
+  async create(createUserDto: CreateUserDto): Promise<UserBasicInfo> {
     // check if the user exists in the db
-    const userInDb = await this.prisma.user.findFirst({
+    const userInDb: User = await this.prisma.user.findUnique({
       where: { email: createUserDto.email },
     });
 
     if (userInDb) {
       throw new HttpException('user_already_exist', HttpStatus.CONFLICT);
     }
-    return this.prisma.user.create({
+    const newUser = await this.prisma.user.create({
       data: {
         ...createUserDto,
         // role: "CLIENT" as const,
         password: await hash(createUserDto.password, 10),
       },
     });
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password: p, ...rest }: User = newUser;
+    return rest;
   }
 
   /**
@@ -104,9 +113,9 @@ export class UsersService {
    * @param {string} email
    * @param {string} password
    */
-  async findByLogin({ email, password }: LoginUserDto): Promise<FormatLogin> {
+  async findByLogin({ email, password }: LoginUserDto): Promise<UserBasicInfo> {
     // TODO: check
-    const user: User = await this.prisma.user.findFirst({
+    const user: User = await this.prisma.user.findUnique({
       where: { email },
     });
 
@@ -118,7 +127,7 @@ export class UsersService {
     const areEqual = await compare(password, user.password);
 
     if (!areEqual) {
-      throw new HttpException('INVALID_CREDENTIALS', HttpStatus.UNAUTHORIZED);
+      throw new UnauthorizedException('INVALID_CREDENTIALS');
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -132,7 +141,7 @@ export class UsersService {
    * @param {string} email
    */
   async findByPayload({ email }: JwtPayload): Promise<User> {
-    return this.prisma.user.findFirst({
+    return this.prisma.user.findUnique({
       where: { email },
     });
   }

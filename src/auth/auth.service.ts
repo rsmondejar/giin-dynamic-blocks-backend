@@ -10,13 +10,15 @@ import { FormatLogin } from '../users/interfaces/format-login.interface';
 import { AuthToken } from './interfaces/auth-token.interface';
 import { User } from '@prisma/client';
 import { MeStatus } from './interfaces/me-status.interface';
+import { UserBasicInfo } from '../users/interfaces/user-basic-info.interface';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly usersService: UsersService,
-  ) {}
+  ) {
+  }
 
   /**
    * Register
@@ -49,15 +51,36 @@ export class AuthService {
     let status: LoginStatus = {
       success: true,
       message: 'ACCOUNT_LOGIN_SUCCESS',
-      data: { token: null },
+      data: {
+        user: null,
+        backendTokens: {
+          accessToken: null,
+          refreshToken: null,
+        },
+      },
     };
 
     try {
-      const user: FormatLogin =
+      const user: UserBasicInfo =
         await this.usersService.findByLogin(loginUserDto);
 
+      status.data.user = {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        lastName: user.lastName,
+        createdAt: user.createdAt,
+      };
+
       // generate and sign token
-      status.data.token = await this.createToken(user);
+      status.data.backendTokens.accessToken = await this.createToken(
+        user.email,
+        process.env.JWT_EXPIRES_IN,
+      );
+      status.data.backendTokens.refreshToken = await this.createToken(
+        user.email,
+        process.env.JWT_EXPIRES_IN_REFRESH,
+      );
     } catch (err) {
       status = {
         success: false,
@@ -100,14 +123,21 @@ export class AuthService {
   /**
    * Create token
    * @param {string} email
+   * @param {string|null} expiresIn
    * @returns {Promise<AuthToken>}
    */
-  private async createToken({ email }): Promise<AuthToken> {
+  private async createToken(
+    email: string,
+    expiresIn: string = null,
+  ): Promise<AuthToken> {
     const user: JwtPayload = { email };
-    const Authorization = this.jwtService.sign(user);
+    const Authorization = this.jwtService.sign(user, {
+      expiresIn: expiresIn || process.env.JWT_EXPIRES_IN,
+      secret: process.env.JWT_SECRET_KEY,
+    });
 
     return {
-      expiresIn: process.env.EXPIRESIN,
+      expiresIn: expiresIn || process.env.JWT_EXPIRES_IN,
       Authorization,
     };
   }
