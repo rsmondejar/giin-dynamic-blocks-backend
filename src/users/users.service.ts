@@ -9,7 +9,6 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../../prisma/prisma.service';
 import { compare, hash } from 'bcrypt';
 import { LoginUserDto } from './dto/login-user.dto';
-import { FormatLogin } from './interfaces/format-login.interface';
 import { UpdatePasswordUserDto } from './dto/update-password-user.dto';
 import { User } from '@prisma/client';
 import { UserBasicInfo } from './interfaces/user-basic-info.interface';

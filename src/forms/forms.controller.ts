@@ -1,34 +1,43 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  UseGuards,
+  UseInterceptors,
+  ClassSerializerInterceptor, Request,
+} from '@nestjs/common';
 import { FormsService } from './forms.service';
-import { CreateFormDto } from './dto/create-form.dto';
-import { UpdateFormDto } from './dto/update-form.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { ApiSecurity } from '@nestjs/swagger';
+import { CreateFormRequestDto } from './dto/create-form-request.dto';
 
 @Controller('forms')
 export class FormsController {
   constructor(private readonly formsService: FormsService) {}
 
+  @UseGuards(JwtAuthGuard)
+  @ApiSecurity('access-key')
+  @UseInterceptors(ClassSerializerInterceptor)
   @Post()
-  create(@Body() createFormDto: CreateFormDto) {
-    return this.formsService.create(createFormDto);
+  async create(@Body() createFormDto: CreateFormRequestDto, @Request() req) {
+    return await this.formsService.create({
+      ...createFormDto,
+      authorId: req.user.id,
+    });
   }
 
-  @Get()
-  findAll() {
-    return this.formsService.findAll();
-  }
+  // @Get()
+  // findAll() {
+  //   return this.formsService.findAll();
+  // }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.formsService.findOne(+id);
-  }
+  // @Get(':id')
+  // async findOne(@Param('id') id: string) {
+  //   return await this.formsService.findOne(id);
+  // }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateFormDto: UpdateFormDto) {
-    return this.formsService.update(+id, updateFormDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.formsService.remove(+id);
-  }
+  // @Delete(':id')
+  // async remove(@Param('id') id: string) {
+  //   return await this.formsService.remove(id);
+  // }
 }
