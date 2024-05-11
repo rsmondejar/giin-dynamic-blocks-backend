@@ -1,5 +1,6 @@
 import { IsBoolean, IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { FieldValue, User } from '@prisma/client';
+import { FormUserRoles, User } from '@prisma/client';
+import { QuestionDto } from './question.dto';
 
 export class CreateFormDto {
   @IsNotEmpty()
@@ -21,6 +22,9 @@ export class CreateFormDto {
   @IsNotEmpty()
   author?: User;
 
-  @IsOptional()
-  fieldValues?: FieldValue[];
+  @IsNotEmpty()
+  questions: QuestionDto[];
+
+  @IsNotEmpty()
+  formsRoles?: FormUserRoles[];
 }

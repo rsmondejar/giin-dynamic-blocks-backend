@@ -5,6 +5,7 @@ import slugify from 'slugify';
 import { ObjectId } from 'bson';
 import { CreateFormRequestDto } from './dto/create-form-request.dto';
 import { QuestionDto } from './dto/question.dto';
+import { QuestionOptionDto } from './dto/question-option.dto';
 
 @Injectable()
 export class FormsService {
@@ -17,72 +18,73 @@ export class FormsService {
   async create(createFormDto: CreateFormRequestDto) {
     const questions: QuestionDto[] = createFormDto.questions;
     const authorId = createFormDto.authorId;
-    delete createFormDto.questions;
     delete createFormDto.authorId;
 
     const id: string = new ObjectId().toString().slice(0, 8).toLowerCase();
     const data: CreateFormDto = {
       ...createFormDto,
       slug: slugify(`${createFormDto.title} ${id}}`, { lower: true }),
-      isPublished: false,
+      isPublished: true,
     };
 
     // Remove options from question with empty values
-    const questionsOptionsCleaned: any = questions.map((question) => {
-      const questionType: string = question.type;
-      delete question.type;
-      delete question.id;
+    data.questions = questions.map((question: QuestionDto): QuestionDto => {
+      question.id = new ObjectId().toString();
 
       if (question.options) {
-        const options: { key: string; value: string }[] = question.options
-          .map(({ key, value }): { key: string; value: string } => {
-            return { key, value };
+        const options: QuestionOptionDto[] = question.options
+          .map(({ key, value, order }): QuestionOptionDto => {
+            key = new ObjectId().toString();
+            return { key, value, order };
           })
-          .filter(
-            (option: { key: string; value: string }): boolean =>
-              option.value !== '',
-          );
+          .filter((option: QuestionOptionDto): boolean => option.value !== '');
         return {
           ...question,
-          field: { connect: { type: questionType } },
-          options: {
-            create: options,
-          },
+          options: options,
         };
       }
-      return {
-        ...question,
-        field: { connect: { type: questionType } },
-      };
+      return question;
+    });
+
+    const roleOwner = await this.prisma.role.findFirst({
+      where: {
+        type: 'owner',
+      },
     });
 
     return this.prisma.form.create({
       data: {
         ...data,
         author: { connect: { id: authorId } },
-        fieldValues: {
-          create: questionsOptionsCleaned,
+        formsRoles: {
+          create: [
+            {
+              userId: authorId,
+              roleId: roleOwner.id,
+            },
+          ],
         },
       },
       include: {
-        fieldValues: {
+        formsRoles: {
           include: {
-            options: true,
+            role: {
+              select: {
+                id: true,
+                name: true,
+                type: true,
+              },
+            },
+            user: {
+              select: {
+                id: true,
+                name: true,
+                lastName: true,
+              },
+            },
           },
         },
       },
     });
   }
-
-  // findAll() {
-  //   return `This action returns all forms`;
-  // }
-
-  // findOne(id: string) {
-  //   return `This action returns a #${id} form`;
-  // }
-
-  // remove(id: string) {
-  //   return `This action removes a #${id} form`;
-  // }
 }

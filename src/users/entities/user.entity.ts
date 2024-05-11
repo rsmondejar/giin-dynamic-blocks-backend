@@ -16,6 +16,9 @@ export class UserEntity implements User {
   lastName: string | null;
 
   @Exclude()
+  isAdmin: boolean;
+
+  @Exclude()
   password: string;
 
   @ApiProperty()

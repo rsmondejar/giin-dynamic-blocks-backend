@@ -1,4 +1,10 @@
-import { IsBoolean, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class QuestionOptionDto {
@@ -11,6 +17,11 @@ export class QuestionOptionDto {
   @IsString()
   @ApiProperty()
   value: string;
+
+  @IsNumber()
+  @IsOptional()
+  @ApiProperty()
+  order?: number;
 
   @IsBoolean()
   @IsOptional()

@@ -1,4 +1,10 @@
-import { IsBoolean, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { QuestionOptionDto } from './question-option.dto';
 
@@ -27,6 +33,11 @@ export class QuestionDto {
   @IsString()
   @ApiProperty()
   type: string;
+
+  @IsNumber()
+  @IsOptional()
+  @ApiProperty()
+  order?: number;
 
   @IsOptional()
   options?: QuestionOptionDto[];
