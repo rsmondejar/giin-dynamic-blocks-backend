@@ -4,7 +4,7 @@ import {
   Body,
   UseGuards,
   UseInterceptors,
-  ClassSerializerInterceptor, Request,
+  ClassSerializerInterceptor, Request, Get,
 } from '@nestjs/common';
 import { FormsService } from './forms.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -24,6 +24,14 @@ export class FormsController {
       ...createFormDto,
       authorId: req.user.id,
     });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiSecurity('access-key')
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Get('find-all-by-user')
+  async findAll(@Request() req) {
+    return await this.formsService.findAllByUser(req.user);
   }
 
   // @Get()
