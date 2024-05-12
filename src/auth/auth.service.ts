@@ -6,7 +6,6 @@ import { RegistrationStatus } from './interfaces/registration-status.interface';
 import { LoginUserDto } from '../users/dto/login-user.dto';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { LoginStatus } from './interfaces/login-status.interface';
-import { FormatLogin } from '../users/interfaces/format-login.interface';
 import { AuthToken } from './interfaces/auth-token.interface';
 import { User } from '@prisma/client';
 import { MeStatus } from './interfaces/me-status.interface';
@@ -81,6 +80,8 @@ export class AuthService {
         user.email,
         process.env.JWT_EXPIRES_IN_REFRESH,
       );
+
+      status.data.user.token = status.data.backendTokens.accessToken;
     } catch (err) {
       status = {
         success: false,
@@ -109,6 +110,7 @@ export class AuthService {
         email: user.email,
         name: user.name,
         lastName: user.lastName,
+        // token: user.token,
         createdAt: user.createdAt,
       };
     } catch (err) {

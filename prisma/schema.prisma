@@ -23,6 +23,7 @@ model User {
   isAdmin       Boolean         @default(false) @map("is_admin")
   isActive      Boolean         @default(true) @map("is_active")
   emailVerified DateTime?       @map("email_verified")
+  token         String?         @unique
   createdAt     DateTime        @default(now()) @map("created_at")
   updatedAt     DateTime        @updatedAt @map("updated_at")
   deletedAt     DateTime?       @map("deleted_at")

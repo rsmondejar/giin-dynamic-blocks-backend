@@ -31,6 +31,10 @@ export class FormsService {
     data.questions = questions.map((question: QuestionDto): QuestionDto => {
       question.id = new ObjectId().toString();
 
+      if (question.options === null) {
+        delete question.options;
+      }
+
       if (question.options) {
         const options: QuestionOptionDto[] = question.options
           .map(({ key, value, order }): QuestionOptionDto => {
