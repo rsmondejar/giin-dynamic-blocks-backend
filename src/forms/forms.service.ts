@@ -6,6 +6,7 @@ import { ObjectId } from 'bson';
 import { CreateFormRequestDto } from './dto/create-form-request.dto';
 import { QuestionDto } from './dto/question.dto';
 import { QuestionOptionDto } from './dto/question-option.dto';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class FormsService {
@@ -13,7 +14,8 @@ export class FormsService {
    * Constructor
    * @param {PrismaService} prisma
    */
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) {
+  }
 
   async create(createFormDto: CreateFormRequestDto) {
     const questions: QuestionDto[] = createFormDto.questions;
@@ -89,6 +91,77 @@ export class FormsService {
           },
         },
       },
+    });
+  }
+
+  async findAllByUser(user: User) {
+    // If user is admin, get all forms.
+    if (user.isAdmin) {
+      return this.prisma.form.findMany({
+        orderBy: [
+          { createdAt: 'desc' },
+        ],
+        include: {
+          _count: {
+            select: {
+              formSubmission: true,
+            },
+          },
+        },
+      });
+    }
+
+    // Get only forms where user has permissions.
+    return this.prisma.form.findMany({
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        description: true,
+        isPublished: true,
+        createdAt: true,
+        author: {
+          select: {
+            id: true,
+            name: true,
+            lastName: true,
+          },
+        },
+        formsRoles: {
+          select: {
+            role: {
+              select: {
+                id: true,
+                name: true,
+                type: true,
+              },
+            },
+            user: {
+              select: {
+                id: true,
+                name: true,
+                lastName: true,
+              },
+            },
+          },
+        },
+        _count: {
+          select: {
+            formSubmission: true,
+            formsRoles: true,
+          },
+        },
+      },
+      where: {
+        formsRoles: {
+          every: {
+            userId: user.id,
+          },
+        },
+      },
+      orderBy: [
+        { createdAt: 'desc' },
+      ],
     });
   }
 }
