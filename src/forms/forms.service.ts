@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateFormDto } from './dto/create-form.dto';
 import { PrismaService } from '../../prisma/prisma.service';
 import slugify from 'slugify';
@@ -7,6 +7,7 @@ import { CreateFormRequestDto } from './dto/create-form-request.dto';
 import { QuestionDto } from './dto/question.dto';
 import { QuestionOptionDto } from './dto/question-option.dto';
 import { User } from '@prisma/client';
+import { FormBasicInfo } from './interfaces/form-basic-info-interface';
 
 @Injectable()
 export class FormsService {
@@ -14,8 +15,7 @@ export class FormsService {
    * Constructor
    * @param {PrismaService} prisma
    */
-  constructor(private prisma: PrismaService) {
-  }
+  constructor(private prisma: PrismaService) {}
 
   async create(createFormDto: CreateFormRequestDto) {
     const questions: QuestionDto[] = createFormDto.questions;
@@ -98,9 +98,7 @@ export class FormsService {
     // If user is admin, get all forms.
     if (user.isAdmin) {
       return this.prisma.form.findMany({
-        orderBy: [
-          { createdAt: 'desc' },
-        ],
+        orderBy: [{ createdAt: 'desc' }],
         include: {
           _count: {
             select: {
@@ -159,9 +157,28 @@ export class FormsService {
           },
         },
       },
-      orderBy: [
-        { createdAt: 'desc' },
-      ],
+      orderBy: [{ createdAt: 'desc' }],
     });
+  }
+
+  async findBySlug(slug: string): Promise<FormBasicInfo> {
+    const form: FormBasicInfo = await this.prisma.form.findUnique({
+      where: {
+        slug: slug,
+      },
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        description: true,
+        questions: true,
+      },
+    });
+
+    if (!form) {
+      throw new HttpException('Form not found', HttpStatus.NOT_FOUND);
+    }
+
+    return form;
   }
 }
