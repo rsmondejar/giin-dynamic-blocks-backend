@@ -4,7 +4,10 @@ import {
   Body,
   UseGuards,
   UseInterceptors,
-  ClassSerializerInterceptor, Request, Get,
+  ClassSerializerInterceptor,
+  Request,
+  Get,
+  Param,
 } from '@nestjs/common';
 import { FormsService } from './forms.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -32,6 +35,12 @@ export class FormsController {
   @Get('find-all-by-user')
   async findAll(@Request() req) {
     return await this.formsService.findAllByUser(req.user);
+  }
+
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Get('find-by-slug/:slug')
+  async findBySlug(@Param('slug') slug: string) {
+    return await this.formsService.findBySlug(slug);
   }
 
   // @Get()
