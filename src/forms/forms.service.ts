@@ -17,6 +17,34 @@ export class FormsService {
    */
   constructor(private prisma: PrismaService) {}
 
+  async findOne(id: string) {
+    try {
+      if (!this.isValidObjectId(id)) {
+        throw new HttpException('Invalid form id', HttpStatus.BAD_REQUEST);
+      }
+
+      const form = await this.prisma.form.findFirst({
+        where: {
+          id: id,
+          deletedAt: {
+            isSet: false,
+          },
+        },
+      });
+
+      if (!form) {
+        throw new HttpException('Form not found', HttpStatus.NOT_FOUND);
+      }
+
+      return form;
+    } catch (error) {
+      throw new HttpException(
+        error.message,
+        error.status ?? HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   async create(createFormDto: CreateFormRequestDto) {
     const questions: QuestionDto[] = createFormDto.questions;
     const authorId = createFormDto.authorId;
@@ -151,6 +179,9 @@ export class FormsService {
         },
       },
       where: {
+        deletedAt: {
+          isSet: false,
+        },
         formsRoles: {
           every: {
             userId: user.id,
@@ -165,6 +196,7 @@ export class FormsService {
     const form: FormBasicInfo = await this.prisma.form.findUnique({
       where: {
         slug: slug,
+        isPublished: true,
       },
       select: {
         id: true,
@@ -180,5 +212,69 @@ export class FormsService {
     }
 
     return form;
+  }
+
+  async delete({ formId, userId }) {
+    try {
+      if (!this.isValidObjectId(formId)) {
+        throw new HttpException('Invalid form id', HttpStatus.BAD_REQUEST);
+      }
+
+      const formExits: FormBasicInfo = await this.findOne(formId);
+
+      if (!formExits) {
+        throw new HttpException(
+          'Form not found does not have permissions',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      // Check if user has permissions to delete form.
+      if (!(await this.checkIfUserHasPermissionsToDeleteForm(formId, userId))) {
+        throw new HttpException(
+          'User does not have permissions to delete form',
+          HttpStatus.FORBIDDEN,
+        );
+      }
+
+      return await this.prisma.form.update({
+        where: {
+          id: formId,
+        },
+        data: {
+          updatedAt: new Date(),
+          deletedAt: new Date(),
+        },
+        select: {
+          id: true,
+          deletedAt: true,
+        },
+      });
+    } catch (error) {
+      throw new HttpException(
+        error.message,
+        error.status ?? HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async checkIfUserHasPermissionsToDeleteForm(
+    formId: string,
+    userId: string,
+  ): Promise<boolean> {
+    const formRoles = await this.prisma.formUserRoles.findFirst({
+      where: {
+        formId: formId,
+        userId: userId,
+        role: {
+          type: 'owner',
+        },
+      },
+    });
+    return !!formRoles;
+  }
+
+  isValidObjectId(id: string): boolean {
+    return id.length === 24 && ObjectId.isValid(id);
   }
 }
