@@ -39,6 +39,11 @@ export class QuestionDto {
   @ApiProperty()
   order?: number;
 
+  @IsBoolean()
+  @IsOptional()
+  @ApiProperty()
+  hasError?: boolean;
+
   @IsOptional()
   options?: QuestionOptionDto[];
 }

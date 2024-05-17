@@ -23,7 +23,6 @@ model User {
   isAdmin       Boolean         @default(false) @map("is_admin")
   isActive      Boolean         @default(true) @map("is_active")
   emailVerified DateTime?       @map("email_verified")
-  token         String?         @unique
   createdAt     DateTime        @default(now()) @map("created_at")
   updatedAt     DateTime        @updatedAt @map("updated_at")
   deletedAt     DateTime?       @map("deleted_at")
@@ -67,7 +66,7 @@ model Form {
   isPublished    Boolean          @default(true) @map("is_published")
   createdAt      DateTime         @default(now()) @map("created_at")
   updatedAt      DateTime         @updatedAt @map("updated_at")
-  deletedAt      DateTime?        @map("deleted_at")
+  deletedAt      DateTime?        @map("deleted_at") @db.Timestamp()
   questions      Question[]
   formSubmission FormSubmission[]
   formsRoles     FormUserRoles[]
@@ -115,7 +114,8 @@ type QuestionOption {
 }
 
 type QuestionAnswer {
-  id         String @db.ObjectId
+  id         String   @db.ObjectId
   questionId String
   value      String
+  values     String[]
 }

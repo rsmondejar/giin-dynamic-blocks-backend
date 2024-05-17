@@ -13,6 +13,7 @@ import { FormsService } from './forms.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ApiSecurity } from '@nestjs/swagger';
 import { CreateFormRequestDto } from './dto/create-form-request.dto';
+import { Delete } from '@nestjs/common/decorators/http/request-mapping.decorator';
 
 @Controller('forms')
 export class FormsController {
@@ -48,13 +49,22 @@ export class FormsController {
   //   return this.formsService.findAll();
   // }
 
-  // @Get(':id')
-  // async findOne(@Param('id') id: string) {
-  //   return await this.formsService.findOne(id);
-  // }
+  @UseGuards(JwtAuthGuard)
+  @ApiSecurity('access-key')
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    return await this.formsService.findOne(id);
+  }
 
-  // @Delete(':id')
-  // async remove(@Param('id') id: string) {
-  //   return await this.formsService.remove(id);
-  // }
+  @UseGuards(JwtAuthGuard)
+  @ApiSecurity('access-key')
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Delete(':id')
+  async remove(@Param('id') id: string, @Request() req) {
+    return await this.formsService.delete({
+      formId: id,
+      userId: req.user.id,
+    });
+  }
 }
