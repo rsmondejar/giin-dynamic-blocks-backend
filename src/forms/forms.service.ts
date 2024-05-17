@@ -60,6 +60,7 @@ export class FormsService {
     // Remove options from question with empty values
     data.questions = questions.map((question: QuestionDto): QuestionDto => {
       question.id = new ObjectId().toString();
+      delete question.hasError;
 
       if (question.options === null) {
         delete question.options;

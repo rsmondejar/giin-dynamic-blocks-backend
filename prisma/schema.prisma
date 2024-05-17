@@ -114,7 +114,8 @@ type QuestionOption {
 }
 
 type QuestionAnswer {
-  id         String @db.ObjectId
+  id         String   @db.ObjectId
   questionId String
   value      String
+  values     String[]
 }
