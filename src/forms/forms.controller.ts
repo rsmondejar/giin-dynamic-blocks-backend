@@ -8,12 +8,15 @@ import {
   Request,
   Get,
   Param,
+  Res,
+  Header,
 } from '@nestjs/common';
 import { FormsService } from './forms.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ApiSecurity } from '@nestjs/swagger';
 import { CreateFormRequestDto } from './dto/create-form-request.dto';
 import { Delete } from '@nestjs/common/decorators/http/request-mapping.decorator';
+import { Response } from 'express';
 
 @Controller('forms')
 export class FormsController {
@@ -44,11 +47,6 @@ export class FormsController {
     return await this.formsService.findBySlug(slug);
   }
 
-  // @Get()
-  // findAll() {
-  //   return this.formsService.findAll();
-  // }
-
   @UseGuards(JwtAuthGuard)
   @ApiSecurity('access-key')
   @UseInterceptors(ClassSerializerInterceptor)
@@ -66,5 +64,29 @@ export class FormsController {
       formId: id,
       userId: req.user.id,
     });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiSecurity('access-key')
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Get(':id/submissions/export/excel')
+  @Header('Content-Type', 'text/xlsx')
+  async submissionsExportExcel(@Param('id') id: string, @Res() res: Response) {
+    try {
+      // res.setHeader(
+      //   'Content-Type',
+      //   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      // );
+      // res.setHeader(
+      //   'Content-Disposition',
+      //   'attachment; filename=' + 'Report.xlsx',
+      // );
+
+      const workbook = await this.formsService.submissionsExportExcel(id);
+      await workbook.xlsx.write(res);
+      res.end();
+    } catch (error: any) {
+      res.status(500).send(error);
+    }
   }
 }
