@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateFormsSubmissionDto } from './dto/create-forms-submission.dto';
 import { PrismaService } from '../../prisma/prisma.service';
 import { ObjectId } from 'bson';
+import { QuestionAnswerDto } from './dto/question-answer.dto';
 
 @Injectable()
 export class FormsSubmissionsService {
@@ -12,9 +13,9 @@ export class FormsSubmissionsService {
   constructor(private prisma: PrismaService) {}
 
   async create(createFormsSubmissionDto: CreateFormsSubmissionDto) {
-    const formId = createFormsSubmissionDto.formId;
+    const formId: string = createFormsSubmissionDto.formId;
 
-    const answers = createFormsSubmissionDto.answers;
+    const answers: QuestionAnswerDto[] = createFormsSubmissionDto.answers;
 
     answers.map((answer) => {
       answer.id = new ObjectId().toString();

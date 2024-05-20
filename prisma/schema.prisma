@@ -116,6 +116,13 @@ type QuestionOption {
 type QuestionAnswer {
   id         String   @db.ObjectId
   questionId String
+  type       String
+  title      String
   value      String
-  values     String[]
+  values    QuestionAnswerOption[]
+}
+
+type QuestionAnswerOption {
+  key   String
+  value String
 }

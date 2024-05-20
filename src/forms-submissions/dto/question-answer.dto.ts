@@ -10,11 +10,20 @@ export class QuestionAnswerDto {
   @ApiProperty()
   questionId: string;
 
+  @IsNotEmpty()
+  @IsString()
+  @ApiProperty()
+  type: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @ApiProperty()
+  title: string;
+
   @IsString()
   @ApiProperty()
   value: string;
 
-  @IsString()
   @ApiProperty()
-  values: string[];
+  values: QuestionAnswerOption[];
 }

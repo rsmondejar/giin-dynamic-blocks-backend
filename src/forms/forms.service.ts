@@ -7,7 +7,9 @@ import { CreateFormRequestDto } from './dto/create-form-request.dto';
 import { QuestionDto } from './dto/question.dto';
 import { QuestionOptionDto } from './dto/question-option.dto';
 import { User } from '@prisma/client';
-import { FormBasicInfo } from './interfaces/form-basic-info-interface';
+import { FormBasicInfo } from './interfaces/form-basic-info.interface';
+import { Workbook, Worksheet } from 'exceljs';
+import QuestionType from './enums/question-type-enum';
 
 @Injectable()
 export class FormsService {
@@ -273,6 +275,75 @@ export class FormsService {
       },
     });
     return !!formRoles;
+  }
+
+  async submissionsExportExcel(id: string) {
+    try {
+      if (!this.isValidObjectId(id)) {
+        throw new HttpException('Invalid form id', HttpStatus.BAD_REQUEST);
+      }
+
+      const form = await this.prisma.form.findFirst({
+        where: {
+          id: id,
+          deletedAt: {
+            isSet: false,
+          },
+        },
+      });
+
+      if (!form) {
+        throw new HttpException('Form not found', HttpStatus.NOT_FOUND);
+      }
+
+      // TODO: check if user has permissions to export form submissions
+
+      // Get form submissions
+      const formSubmissions = await this.prisma.formSubmission.findMany({
+        where: {
+          formId: id,
+        },
+      });
+
+      const workbook: Workbook = new Workbook();
+      const worksheet: Worksheet = workbook.addWorksheet('form_submissions');
+
+      // Set Excel columns
+      worksheet.columns = form.questions.map((question) => {
+        return {
+          header: question.title,
+          key: question.id,
+        };
+      });
+
+      formSubmissions.forEach((submission) => {
+        const row = {};
+        submission.answers.forEach((answer) => {
+          if (
+            [QuestionType.InputSelect, QuestionType.InputRadio].includes(
+              answer.type as QuestionType,
+            ) &&
+            answer.values.length > 0
+          ) {
+            row[answer.questionId] = answer.values[0]?.value ?? '';
+          } else if (answer.type === QuestionType.InputCheckbox) {
+            row[answer.questionId] = answer.values
+              .map((value) => value.value)
+              .join(', ');
+          } else {
+            row[answer.questionId] = answer.value;
+          }
+        });
+        worksheet.addRow(row);
+      });
+
+      return workbook;
+    } catch (error) {
+      throw new HttpException(
+        error.message,
+        error.status ?? HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   isValidObjectId(id: string): boolean {
