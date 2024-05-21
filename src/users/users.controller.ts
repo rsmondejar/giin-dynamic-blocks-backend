@@ -3,7 +3,6 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   UseInterceptors,
@@ -14,7 +13,6 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ApiSecurity } from '@nestjs/swagger';
 import { UpdatePasswordUserDto } from './dto/update-password-user.dto';
@@ -38,11 +36,6 @@ export class UsersController {
     return await this.usersService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(id, updateUserDto);
-  }
-
   @Delete(':id')
   async remove(@Param('id') id: string) {
     return await this.usersService.remove(id);
@@ -57,7 +50,6 @@ export class UsersController {
     @Body()
     updatePasswordDto: UpdatePasswordUserDto,
   ) {
-    // TODO: check
     await this.usersService.updatePassword(updatePasswordDto, req.user.id);
     return {
       message: 'password_update_success',
