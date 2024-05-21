@@ -10,6 +10,8 @@ import { User } from '@prisma/client';
 import { FormBasicInfo } from './interfaces/form-basic-info.interface';
 import { Workbook, Worksheet } from 'exceljs';
 import QuestionType from './enums/question-type-enum';
+import { AddPermissionDto } from './dto/add-permission.dto';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class FormsService {
@@ -170,6 +172,7 @@ export class FormsService {
                 id: true,
                 name: true,
                 lastName: true,
+                email: true,
               },
             },
           },
@@ -186,7 +189,7 @@ export class FormsService {
           isSet: false,
         },
         formsRoles: {
-          every: {
+          some: {
             userId: user.id,
           },
         },
@@ -338,6 +341,65 @@ export class FormsService {
       });
 
       return workbook;
+    } catch (error) {
+      throw new HttpException(
+        error.message,
+        error.status ?? HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async permissionsAdd(id: string, addPermissionsDto: AddPermissionDto) {
+    try {
+      // Check if form exists
+      await this.findOne(id);
+
+      // Check if user exists
+      const user = await new UsersService(this.prisma).findByEmail(
+        addPermissionsDto.email,
+      );
+
+      if (!user) {
+        throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      }
+
+      // Check if user has any role in this form
+      const userRole = await this.prisma.formUserRoles.findFirst({
+        where: {
+          userId: user.id,
+          formId: id,
+        },
+      });
+
+      if (userRole) {
+        // Update user role
+        const formUserRoleUpdate = await this.prisma.formUserRoles.update({
+          where: {
+            id: userRole.id,
+          },
+          data: {
+            roleId: addPermissionsDto.roleId,
+          },
+        });
+
+        return {
+          message: 'User role updated',
+          ...formUserRoleUpdate,
+        };
+      } else {
+        // Create user role
+        const formUserRoleCreated = await this.prisma.formUserRoles.create({
+          data: {
+            userId: user.id,
+            formId: id,
+            roleId: addPermissionsDto.roleId,
+          },
+        });
+        return {
+          message: 'User role created',
+          ...formUserRoleCreated,
+        };
+      }
     } catch (error) {
       throw new HttpException(
         error.message,
