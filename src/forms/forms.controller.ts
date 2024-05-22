@@ -19,6 +19,7 @@ import { Delete } from '@nestjs/common/decorators/http/request-mapping.decorator
 import { Response } from 'express';
 import { Workbook } from 'exceljs';
 import { AddPermissionDto } from './dto/add-permission.dto';
+import { RemovePermissionDto } from './dto/remove-permission.dto';
 
 @Controller('forms')
 export class FormsController {
@@ -93,5 +94,16 @@ export class FormsController {
     @Body() addPermissionsDto: AddPermissionDto,
   ) {
     return await this.formsService.permissionsAdd(id, addPermissionsDto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiSecurity('access-key')
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Post(':id/permissions/remove')
+  async permissionsRemove(
+    @Param('id') id: string,
+    @Body() removePermissionsDto: RemovePermissionDto,
+  ) {
+    return await this.formsService.permissionsRemove(id, removePermissionsDto);
   }
 }

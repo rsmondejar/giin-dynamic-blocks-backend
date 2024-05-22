@@ -12,6 +12,7 @@ import { Workbook, Worksheet } from 'exceljs';
 import QuestionType from './enums/question-type-enum';
 import { AddPermissionDto } from './dto/add-permission.dto';
 import { UsersService } from '../users/users.service';
+import { RemovePermissionDto } from './dto/remove-permission.dto';
 
 @Injectable()
 export class FormsService {
@@ -203,12 +204,16 @@ export class FormsService {
       where: {
         slug: slug,
         isPublished: true,
+        deletedAt: {
+          isSet: false,
+        },
       },
       select: {
         id: true,
         title: true,
         slug: true,
         description: true,
+        isPublished: true,
         questions: true,
       },
     });
@@ -400,6 +405,56 @@ export class FormsService {
           ...formUserRoleCreated,
         };
       }
+    } catch (error) {
+      throw new HttpException(
+        error.message,
+        error.status ?? HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async permissionsRemove(
+    id: string,
+    removePermissionsDto: RemovePermissionDto,
+  ) {
+    try {
+      // Check if form exists
+      await this.findOne(id);
+
+      // Check if user exists
+      const user = await new UsersService(this.prisma).findByEmail(
+        removePermissionsDto.email,
+      );
+
+      if (!user) {
+        throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      }
+
+      // // Check if user has any role in this form
+      const userRole = await this.prisma.formUserRoles.findFirst({
+        where: {
+          userId: user.id,
+          formId: id,
+        },
+      });
+
+      if (!userRole) {
+        throw new HttpException(
+          'User does not have permission in this form',
+          HttpStatus.FORBIDDEN,
+        );
+      }
+
+      const formUserRoleRemove = await this.prisma.formUserRoles.delete({
+        where: {
+          id: userRole.id,
+        },
+      });
+
+      return {
+        message: 'User role deleted',
+        ...formUserRoleRemove,
+      };
     } catch (error) {
       throw new HttpException(
         error.message,
