@@ -5,7 +5,6 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../../prisma/prisma.service';
 import { compare, hash } from 'bcrypt';
 import { LoginUserDto } from './dto/login-user.dto';
@@ -78,11 +77,6 @@ export class UsersService {
     return rest;
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto) {
-    // TODO: check
-    return `This action updates a #${id} user`;
-  }
-
   /**
    * Remove a user by id
    * @param {string} id
@@ -113,7 +107,6 @@ export class UsersService {
    * @param {string} password
    */
   async findByLogin({ email, password }: LoginUserDto): Promise<UserBasicInfo> {
-    // TODO: check
     const user: User = await this.prisma.user.findUnique({
       where: { email },
     });
@@ -134,15 +127,21 @@ export class UsersService {
     return rest;
   }
 
+  async findByEmail(email: string): Promise<User> {
+    return this.prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+    });
+  }
+
   /**
    * Find user by payload.
    * Use by auth module to get user in database
    * @param {string} email
    */
   async findByPayload({ email }: JwtPayload): Promise<User> {
-    return this.prisma.user.findUnique({
-      where: { email },
-    });
+    return await this.findByEmail(email);
   }
 
   /**
@@ -155,7 +154,6 @@ export class UsersService {
     payload: UpdatePasswordUserDto,
     id: string,
   ): Promise<User> {
-    // TODO: check
     const user = await this.prisma.user.findUnique({
       where: { id },
     });
