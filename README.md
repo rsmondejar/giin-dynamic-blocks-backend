@@ -1,3 +1,14 @@
+# VIU GIIN Dynamic Blocks Backend
+[![SonarCloud](https://sonarcloud.io/images/project_badges/sonarcloud-white.svg)](https://sonarcloud.io/summary/new_code?id=rsmondejar_giin-dynamic-blocks-frontend)
+
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=rsmondejar_giin-dynamic-blocks-backend&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=rsmondejar_giin-dynamic-blocks-backend)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=rsmondejar_giin-dynamic-blocks-backend&metric=bugs)](https://sonarcloud.io/summary/new_code?id=rsmondejar_giin-dynamic-blocks-backend)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=rsmondejar_giin-dynamic-blocks-backend&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=rsmondejar_giin-dynamic-blocks-backend)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=rsmondejar_giin-dynamic-blocks-backend&metric=coverage)](https://sonarcloud.io/summary/new_code?id=rsmondejar_giin-dynamic-blocks-backend)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=rsmondejar_giin-dynamic-blocks-backend&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=rsmondejar_giin-dynamic-blocks-backend)
+
+___
+
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
 </p>
