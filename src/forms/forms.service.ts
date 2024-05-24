@@ -92,7 +92,7 @@ export class FormsService {
       },
     });
 
-    return this.prisma.form.create({
+    const formCreated = await this.prisma.form.create({
       data: {
         ...data,
         author: { connect: { id: authorId } },
@@ -126,6 +126,18 @@ export class FormsService {
         },
       },
     });
+
+    await this.prisma.audit.create({
+      data: {
+        action: 'create',
+        entity: 'form',
+        entityId: formCreated.id,
+        userId: authorId,
+        detail: formCreated,
+      },
+    });
+
+    return formCreated;
   }
 
   async findAllByUser(user: User) {
@@ -248,7 +260,7 @@ export class FormsService {
         );
       }
 
-      return await this.prisma.form.update({
+      const formDeleted = await this.prisma.form.update({
         where: {
           id: formId,
         },
@@ -261,6 +273,18 @@ export class FormsService {
           deletedAt: true,
         },
       });
+
+      await this.prisma.audit.create({
+        data: {
+          action: 'delete',
+          entity: 'form',
+          entityId: formDeleted.id,
+          userId: userId,
+          detail: formDeleted,
+        },
+      });
+
+      return formDeleted;
     } catch (error) {
       throw new HttpException(
         error.message,
