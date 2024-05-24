@@ -28,6 +28,7 @@ model User {
   deletedAt     DateTime?       @map("deleted_at")
   formsRoles    FormUserRoles[]
   authorForms   Form[]
+  Audit         Audit[]
 
   @@map("users")
 }
@@ -97,6 +98,21 @@ model FormSubmission {
   @@map("form_submissions")
 }
 
+model Audit {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String    @map("user_id") @db.ObjectId
+  user      User      @relation(fields: [userId], references: [id])
+  action    String
+  entity    String
+  entityId  String    @map("entity_id")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  detail    Json?
+
+  @@map("audits")
+}
+
 type Question {
   id          String           @db.ObjectId
   title       String
@@ -114,12 +130,12 @@ type QuestionOption {
 }
 
 type QuestionAnswer {
-  id         String   @db.ObjectId
+  id         String                 @db.ObjectId
   questionId String
   type       String
   title      String
   value      String
-  values    QuestionAnswerOption[]
+  values     QuestionAnswerOption[]
 }
 
 type QuestionAnswerOption {

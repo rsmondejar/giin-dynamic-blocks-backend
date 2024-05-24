@@ -3,9 +3,11 @@ import { AppModule } from './app.module';
 import * as process from 'node:process';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app: NestExpressApplication = await NestFactory.create(AppModule);
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -16,14 +18,18 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('GIIN Dynamic Blocks API')
     .setDescription('API Dynamic Blocks description')
-    .setVersion('0.1.0')
+    .setVersion('1.0.0')
     .addTag('API')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('api', app, document, {
+    customfavIcon: 'favicon.ico',
+  });
 
   // TODO: Mirar de reducirlo a solo x dominio para el frontend y que use un paramto del fichero .env
   app.enableCors();
+
+  app.useStaticAssets(join(__dirname, '..', 'public'));
 
   await app.listen(process.env.PORT || 4000);
 }

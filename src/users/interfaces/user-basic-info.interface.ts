@@ -6,6 +6,6 @@ export interface UserBasicInfo extends Partial<User> {
   email: string;
   name: string;
   lastName: string;
-  token?: AuthToken|null;
+  token?: AuthToken | null;
   createdAt: Date;
 }

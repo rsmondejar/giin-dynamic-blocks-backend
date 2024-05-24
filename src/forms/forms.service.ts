@@ -92,7 +92,7 @@ export class FormsService {
       },
     });
 
-    return this.prisma.form.create({
+    const formCreated = await this.prisma.form.create({
       data: {
         ...data,
         author: { connect: { id: authorId } },
@@ -126,6 +126,18 @@ export class FormsService {
         },
       },
     });
+
+    await this.prisma.audit.create({
+      data: {
+        action: 'create',
+        entity: 'form',
+        entityId: formCreated.id,
+        userId: authorId,
+        detail: formCreated,
+      },
+    });
+
+    return formCreated;
   }
 
   async findAllByUser(user: User) {
@@ -248,7 +260,7 @@ export class FormsService {
         );
       }
 
-      return await this.prisma.form.update({
+      const formDeleted = await this.prisma.form.update({
         where: {
           id: formId,
         },
@@ -261,6 +273,18 @@ export class FormsService {
           deletedAt: true,
         },
       });
+
+      await this.prisma.audit.create({
+        data: {
+          action: 'delete',
+          entity: 'form',
+          entityId: formDeleted.id,
+          userId: userId,
+          detail: formDeleted,
+        },
+      });
+
+      return formDeleted;
     } catch (error) {
       throw new HttpException(
         error.message,
@@ -285,7 +309,7 @@ export class FormsService {
     return !!formRoles;
   }
 
-  async submissionsExportExcel(id: string) {
+  async submissionsExportExcel(id: string, authId: string) {
     try {
       if (!this.isValidObjectId(id)) {
         throw new HttpException('Invalid form id', HttpStatus.BAD_REQUEST);
@@ -304,12 +328,35 @@ export class FormsService {
         throw new HttpException('Form not found', HttpStatus.NOT_FOUND);
       }
 
-      // TODO: check if user has permissions to export form submissions
+      // Check if user has permissions to export form submissions
+      const userRole = await this.prisma.formUserRoles.findFirst({
+        where: {
+          userId: authId,
+          formId: id,
+        },
+      });
+
+      if (!userRole) {
+        throw new HttpException(
+          'User does not have permissions to export form submissions',
+          HttpStatus.FORBIDDEN,
+        );
+      }
 
       // Get form submissions
       const formSubmissions = await this.prisma.formSubmission.findMany({
         where: {
           formId: id,
+        },
+      });
+
+      await this.prisma.audit.create({
+        data: {
+          action: 'export',
+          entity: 'formSubmissionExcelExport',
+          entityId: id,
+          userId: authId,
+          detail: formSubmissions,
         },
       });
 
@@ -354,7 +401,11 @@ export class FormsService {
     }
   }
 
-  async permissionsAdd(id: string, addPermissionsDto: AddPermissionDto) {
+  async permissionsAdd(
+    id: string,
+    addPermissionsDto: AddPermissionDto,
+    authId: string,
+  ) {
     try {
       // Check if form exists
       await this.findOne(id);
@@ -387,6 +438,19 @@ export class FormsService {
           },
         });
 
+        await this.prisma.audit.create({
+          data: {
+            action: 'update',
+            entity: 'formUserRole',
+            entityId: formUserRoleUpdate.id,
+            userId: authId,
+            detail: {
+              message: 'User role updated',
+              ...formUserRoleUpdate,
+            },
+          },
+        });
+
         return {
           message: 'User role updated',
           ...formUserRoleUpdate,
@@ -400,6 +464,20 @@ export class FormsService {
             roleId: addPermissionsDto.roleId,
           },
         });
+
+        await this.prisma.audit.create({
+          data: {
+            action: 'create',
+            entity: 'formUserRole',
+            entityId: formUserRoleCreated.id,
+            userId: authId,
+            detail: {
+              message: 'User role created',
+              ...formUserRoleCreated,
+            },
+          },
+        });
+
         return {
           message: 'User role created',
           ...formUserRoleCreated,
@@ -416,6 +494,7 @@ export class FormsService {
   async permissionsRemove(
     id: string,
     removePermissionsDto: RemovePermissionDto,
+    authId: string,
   ) {
     try {
       // Check if form exists
@@ -448,6 +527,19 @@ export class FormsService {
       const formUserRoleRemove = await this.prisma.formUserRoles.delete({
         where: {
           id: userRole.id,
+        },
+      });
+
+      await this.prisma.audit.create({
+        data: {
+          action: 'delete',
+          entity: 'formUserRole',
+          entityId: formUserRoleRemove.id,
+          userId: authId,
+          detail: {
+            message: 'User role deleted',
+            ...formUserRoleRemove,
+          },
         },
       });
 

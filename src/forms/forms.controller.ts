@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import { FormsService } from './forms.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { ApiSecurity } from '@nestjs/swagger';
+import { ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { CreateFormRequestDto } from './dto/create-form-request.dto';
 import { Delete } from '@nestjs/common/decorators/http/request-mapping.decorator';
 import { Response } from 'express';
@@ -21,6 +21,7 @@ import { Workbook } from 'exceljs';
 import { AddPermissionDto } from './dto/add-permission.dto';
 import { RemovePermissionDto } from './dto/remove-permission.dto';
 
+@ApiTags('forms')
 @Controller('forms')
 export class FormsController {
   constructor(private readonly formsService: FormsService) {}
@@ -74,10 +75,16 @@ export class FormsController {
   @UseInterceptors(ClassSerializerInterceptor)
   @Get(':id/submissions/export/excel')
   @Header('Content-Type', 'text/xlsx')
-  async submissionsExportExcel(@Param('id') id: string, @Res() res: Response) {
+  async submissionsExportExcel(
+    @Param('id') id: string,
+    @Res() res: Response,
+    @Request() req,
+  ) {
     try {
-      const workbook: Workbook =
-        await this.formsService.submissionsExportExcel(id);
+      const workbook: Workbook = await this.formsService.submissionsExportExcel(
+        id,
+        req.user.id,
+      );
       await workbook.xlsx.write(res);
       res.end();
     } catch (error: any) {
@@ -92,8 +99,13 @@ export class FormsController {
   async permissionsAdd(
     @Param('id') id: string,
     @Body() addPermissionsDto: AddPermissionDto,
+    @Request() req,
   ) {
-    return await this.formsService.permissionsAdd(id, addPermissionsDto);
+    return await this.formsService.permissionsAdd(
+      id,
+      addPermissionsDto,
+      req.user.id,
+    );
   }
 
   @UseGuards(JwtAuthGuard)
@@ -103,7 +115,12 @@ export class FormsController {
   async permissionsRemove(
     @Param('id') id: string,
     @Body() removePermissionsDto: RemovePermissionDto,
+    @Request() req,
   ) {
-    return await this.formsService.permissionsRemove(id, removePermissionsDto);
+    return await this.formsService.permissionsRemove(
+      id,
+      removePermissionsDto,
+      req.user.id,
+    );
   }
 }

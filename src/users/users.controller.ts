@@ -14,9 +14,10 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { ApiSecurity } from '@nestjs/swagger';
+import { ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { UpdatePasswordUserDto } from './dto/update-password-user.dto';
 
+@ApiTags('users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -36,9 +37,15 @@ export class UsersController {
     return await this.usersService.findOne(id);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @ApiSecurity('access-key')
+  @UseInterceptors(ClassSerializerInterceptor)
   @Delete(':id')
-  async remove(@Param('id') id: string) {
-    return await this.usersService.remove(id);
+  async remove(@Param('id') id: string, @Request() req) {
+    return await this.usersService.remove({
+      id,
+      authId: req.user.id,
+    });
   }
 
   @UseGuards(JwtAuthGuard)

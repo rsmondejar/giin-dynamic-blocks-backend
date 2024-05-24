@@ -12,6 +12,7 @@ import { UpdatePasswordUserDto } from './dto/update-password-user.dto';
 import { User } from '@prisma/client';
 import { UserBasicInfo } from './interfaces/user-basic-info.interface';
 import { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
+import { DeleteUserResponse } from './interfaces/delete-user-response.interface';
 
 @Injectable()
 export class UsersService {
@@ -45,6 +46,17 @@ export class UsersService {
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password: p, ...rest }: User = newUser;
+
+    await this.prisma.audit.create({
+      data: {
+        action: 'create',
+        entity: 'User',
+        entityId: rest.id,
+        userId: rest.id,
+        detail: rest,
+      },
+    });
+
     return rest;
   }
 
@@ -80,9 +92,10 @@ export class UsersService {
   /**
    * Remove a user by id
    * @param {string} id
+   * @param {string} authId
    * @returns {Promise<UserBasicInfo>}
    */
-  async remove(id: string): Promise<UserBasicInfo> {
+  async remove({ id, authId }): Promise<DeleteUserResponse> {
     const user = await this.prisma.user.findUnique({
       where: {
         id: id,
@@ -93,11 +106,50 @@ export class UsersService {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
-    return this.prisma.user.delete({
+    // Check if logged user is the same as the user to delete and is not an admin
+    const authUser = await this.prisma.user.findUnique({
+      where: {
+        id: authId,
+      },
+      select: {
+        isAdmin: true,
+      },
+    });
+
+    console.log(authId);
+
+    if (user.id !== authId && !authUser.isAdmin) {
+      throw new HttpException(
+        'You do not have permissions',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    const userDeleted = await this.prisma.user.update({
       where: {
         id: id,
       },
+      data: {
+        updatedAt: new Date(),
+        deletedAt: new Date(),
+      },
+      select: {
+        id: true,
+        deletedAt: true,
+      },
     });
+
+    await this.prisma.audit.create({
+      data: {
+        action: 'delete',
+        entity: 'User',
+        entityId: id,
+        userId: authId,
+        detail: userDeleted,
+      },
+    });
+
+    return userDeleted;
   }
 
   /**
