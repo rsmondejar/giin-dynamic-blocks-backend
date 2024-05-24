@@ -309,7 +309,7 @@ export class FormsService {
     return !!formRoles;
   }
 
-  async submissionsExportExcel(id: string) {
+  async submissionsExportExcel(id: string, authId: string) {
     try {
       if (!this.isValidObjectId(id)) {
         throw new HttpException('Invalid form id', HttpStatus.BAD_REQUEST);
@@ -328,12 +328,35 @@ export class FormsService {
         throw new HttpException('Form not found', HttpStatus.NOT_FOUND);
       }
 
-      // TODO: check if user has permissions to export form submissions
+      // Check if user has permissions to export form submissions
+      const userRole = await this.prisma.formUserRoles.findFirst({
+        where: {
+          userId: authId,
+          formId: id,
+        },
+      });
+
+      if (!userRole) {
+        throw new HttpException(
+          'User does not have permissions to export form submissions',
+          HttpStatus.FORBIDDEN,
+        );
+      }
 
       // Get form submissions
       const formSubmissions = await this.prisma.formSubmission.findMany({
         where: {
           formId: id,
+        },
+      });
+
+      await this.prisma.audit.create({
+        data: {
+          action: 'export',
+          entity: 'formSubmissionExcelExport',
+          entityId: id,
+          userId: authId,
+          detail: formSubmissions,
         },
       });
 

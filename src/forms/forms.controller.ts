@@ -74,10 +74,16 @@ export class FormsController {
   @UseInterceptors(ClassSerializerInterceptor)
   @Get(':id/submissions/export/excel')
   @Header('Content-Type', 'text/xlsx')
-  async submissionsExportExcel(@Param('id') id: string, @Res() res: Response) {
+  async submissionsExportExcel(
+    @Param('id') id: string,
+    @Res() res: Response,
+    @Request() req,
+  ) {
     try {
-      const workbook: Workbook =
-        await this.formsService.submissionsExportExcel(id);
+      const workbook: Workbook = await this.formsService.submissionsExportExcel(
+        id,
+        req.user.id,
+      );
       await workbook.xlsx.write(res);
       res.end();
     } catch (error: any) {
