@@ -36,9 +36,15 @@ export class UsersController {
     return await this.usersService.findOne(id);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @ApiSecurity('access-key')
+  @UseInterceptors(ClassSerializerInterceptor)
   @Delete(':id')
-  async remove(@Param('id') id: string) {
-    return await this.usersService.remove(id);
+  async remove(@Param('id') id: string, @Request() req) {
+    return await this.usersService.remove({
+      id,
+      authId: req.user.id,
+    });
   }
 
   @UseGuards(JwtAuthGuard)
