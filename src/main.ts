@@ -16,7 +16,7 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('GIIN Dynamic Blocks API')
     .setDescription('API Dynamic Blocks description')
-    .setVersion('0.1.0')
+    .setVersion('1.0.0')
     .addTag('API')
     .build();
   const document = SwaggerModule.createDocument(app, config);

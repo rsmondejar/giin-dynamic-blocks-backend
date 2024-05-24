@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import { FormsService } from './forms.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { ApiSecurity } from '@nestjs/swagger';
+import { ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { CreateFormRequestDto } from './dto/create-form-request.dto';
 import { Delete } from '@nestjs/common/decorators/http/request-mapping.decorator';
 import { Response } from 'express';
@@ -21,6 +21,7 @@ import { Workbook } from 'exceljs';
 import { AddPermissionDto } from './dto/add-permission.dto';
 import { RemovePermissionDto } from './dto/remove-permission.dto';
 
+@ApiTags('forms')
 @Controller('forms')
 export class FormsController {
   constructor(private readonly formsService: FormsService) {}
