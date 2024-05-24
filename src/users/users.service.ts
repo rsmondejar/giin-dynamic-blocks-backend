@@ -45,6 +45,17 @@ export class UsersService {
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password: p, ...rest }: User = newUser;
+
+    await this.prisma.audit.create({
+      data: {
+        action: 'create',
+        entity: 'User',
+        entityId: rest.id,
+        userId: rest.id,
+        detail: rest,
+      },
+    });
+
     return rest;
   }
 
