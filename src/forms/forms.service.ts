@@ -378,7 +378,11 @@ export class FormsService {
     }
   }
 
-  async permissionsAdd(id: string, addPermissionsDto: AddPermissionDto) {
+  async permissionsAdd(
+    id: string,
+    addPermissionsDto: AddPermissionDto,
+    authId: string,
+  ) {
     try {
       // Check if form exists
       await this.findOne(id);
@@ -411,6 +415,19 @@ export class FormsService {
           },
         });
 
+        await this.prisma.audit.create({
+          data: {
+            action: 'update',
+            entity: 'formUserRole',
+            entityId: formUserRoleUpdate.id,
+            userId: authId,
+            detail: {
+              message: 'User role updated',
+              ...formUserRoleUpdate,
+            },
+          },
+        });
+
         return {
           message: 'User role updated',
           ...formUserRoleUpdate,
@@ -424,6 +441,20 @@ export class FormsService {
             roleId: addPermissionsDto.roleId,
           },
         });
+
+        await this.prisma.audit.create({
+          data: {
+            action: 'create',
+            entity: 'formUserRole',
+            entityId: formUserRoleCreated.id,
+            userId: authId,
+            detail: {
+              message: 'User role created',
+              ...formUserRoleCreated,
+            },
+          },
+        });
+
         return {
           message: 'User role created',
           ...formUserRoleCreated,
@@ -440,6 +471,7 @@ export class FormsService {
   async permissionsRemove(
     id: string,
     removePermissionsDto: RemovePermissionDto,
+    authId: string,
   ) {
     try {
       // Check if form exists
@@ -472,6 +504,19 @@ export class FormsService {
       const formUserRoleRemove = await this.prisma.formUserRoles.delete({
         where: {
           id: userRole.id,
+        },
+      });
+
+      await this.prisma.audit.create({
+        data: {
+          action: 'delete',
+          entity: 'formUserRole',
+          entityId: formUserRoleRemove.id,
+          userId: authId,
+          detail: {
+            message: 'User role deleted',
+            ...formUserRoleRemove,
+          },
         },
       });
 

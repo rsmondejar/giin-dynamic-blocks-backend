@@ -92,8 +92,13 @@ export class FormsController {
   async permissionsAdd(
     @Param('id') id: string,
     @Body() addPermissionsDto: AddPermissionDto,
+    @Request() req,
   ) {
-    return await this.formsService.permissionsAdd(id, addPermissionsDto);
+    return await this.formsService.permissionsAdd(
+      id,
+      addPermissionsDto,
+      req.user.id,
+    );
   }
 
   @UseGuards(JwtAuthGuard)
@@ -103,7 +108,12 @@ export class FormsController {
   async permissionsRemove(
     @Param('id') id: string,
     @Body() removePermissionsDto: RemovePermissionDto,
+    @Request() req,
   ) {
-    return await this.formsService.permissionsRemove(id, removePermissionsDto);
+    return await this.formsService.permissionsRemove(
+      id,
+      removePermissionsDto,
+      req.user.id,
+    );
   }
 }
