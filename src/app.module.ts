@@ -12,10 +12,10 @@ import { join } from 'path';
   controllers: [AppController],
   providers: [AppService],
   imports: [
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'swagger-static'),
-      serveRoot: process.env.NODE_ENV === 'development' ? '/' : '/swagger',
-    }),
+    // ServeStaticModule.forRoot({
+    //   rootPath: join(__dirname, '..', 'public'),
+    //   serveRoot: process.env.NODE_ENV === 'development' ? '/' : '/',
+    // }),
     UsersModule,
     AuthModule,
     FormsModule,
