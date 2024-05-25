@@ -5,10 +5,21 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { FormsModule } from './forms/forms.module';
 import { FormsSubmissionsModule } from './forms-submissions/forms-submissions.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   controllers: [AppController],
   providers: [AppService],
-  imports: [UsersModule, AuthModule, FormsModule, FormsSubmissionsModule],
+  imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'swagger-static'),
+      serveRoot: process.env.NODE_ENV === 'development' ? '/' : '/swagger',
+    }),
+    UsersModule,
+    AuthModule,
+    FormsModule,
+    FormsSubmissionsModule,
+  ],
 })
 export class AppModule {}
