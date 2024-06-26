@@ -5,21 +5,19 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { FormsModule } from './forms/forms.module';
 import { FormsSubmissionsModule } from './forms-submissions/forms-submissions.module';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
+import { MailerModule } from './mailer/mailer.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   controllers: [AppController],
   providers: [AppService],
   imports: [
-    // ServeStaticModule.forRoot({
-    //   rootPath: join(__dirname, '..', 'public'),
-    //   serveRoot: process.env.NODE_ENV === 'development' ? '/' : '/',
-    // }),
+    ConfigModule.forRoot(),
     UsersModule,
     AuthModule,
     FormsModule,
     FormsSubmissionsModule,
+    MailerModule,
   ],
 })
 export class AppModule {}

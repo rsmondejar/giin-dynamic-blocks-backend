@@ -113,6 +113,15 @@ model Audit {
   @@map("audits")
 }
 
+model PasswordReset {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String
+  token     String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("password_resets")
+}
+
 type Question {
   id          String           @db.ObjectId
   title       String

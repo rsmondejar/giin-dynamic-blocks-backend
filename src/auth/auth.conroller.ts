@@ -19,6 +19,10 @@ import { LoginUserDto } from '../users/dto/login-user.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { LoginStatus } from './interfaces/login-status.interface';
 import { MeStatus } from './interfaces/me-status.interface';
+import { SendResetPasswordEmailResponse } from './interfaces/send-reset-password-email-response.interface';
+import { SetResetPasswordResponse } from './interfaces/set-reset-password-response.interface';
+import { SendNewPassword } from '../users/dto/send-new-password.dto';
+import { SetNewPassword } from '../users/dto/set-new-password.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -62,6 +66,45 @@ export class AuthController {
   @Get('me')
   public async me(@Request() req): Promise<MeStatus> {
     const result: MeStatus = await this.authService.me(req.user);
+    if (!result.success) {
+      throw new HttpException(
+        result.message,
+        result.statusCode || HttpStatus.BAD_REQUEST,
+      );
+    }
+    return result;
+  }
+
+  @Post('password/email')
+  @HttpCode(200)
+  @HttpCode(400)
+  @HttpCode(401)
+  public async sendResetPasswordEmail(
+    @Body() body: SendNewPassword,
+  ): Promise<SendResetPasswordEmailResponse> {
+    const result: SendResetPasswordEmailResponse =
+      await this.authService.sendResetPasswordEmail(body.email);
+
+    console.log('result', result);
+
+    if (!result.success) {
+      throw new HttpException(
+        result.message,
+        result.statusCode || HttpStatus.BAD_REQUEST,
+      );
+    }
+    return result;
+  }
+
+  @Post('password/reset')
+  @HttpCode(200)
+  @HttpCode(400)
+  @HttpCode(401)
+  public async setNewPassword(
+    @Body() body: SetNewPassword,
+  ): Promise<SetResetPasswordResponse> {
+    const result: SetResetPasswordResponse =
+      await this.authService.setNewPassword(body);
     if (!result.success) {
       throw new HttpException(
         result.message,
