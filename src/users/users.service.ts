@@ -116,8 +116,6 @@ export class UsersService {
       },
     });
 
-    console.log(authId);
-
     if (user.id !== authId && !authUser.isAdmin) {
       throw new HttpException(
         'You do not have permissions',
@@ -210,12 +208,12 @@ export class UsersService {
       where: { id },
     });
     if (!user) {
-      throw new HttpException('invalid_credentials', HttpStatus.UNAUTHORIZED);
+      throw new HttpException('USER_NOT_FOUND', HttpStatus.NOT_FOUND);
     }
     // compare passwords
     const areEqual = await compare(payload.old_password, user.password);
     if (!areEqual) {
-      throw new HttpException('invalid_credentials', HttpStatus.UNAUTHORIZED);
+      throw new HttpException('INVALID_CREDENTIALS', HttpStatus.UNAUTHORIZED);
     }
     return this.prisma.user.update({
       where: { id },
