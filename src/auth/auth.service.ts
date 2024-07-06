@@ -287,28 +287,28 @@ export class AuthService {
     const frontendUrl = this.configService.get<string>('FRONTEND_URL');
     const resetPasswordUrl = `${frontendUrl}/password/reset/${token}?email=${email}`;
     return `
-    <h1 style="padding: 5px 15px;">¡Hola!</h1>
-    <p style="padding: 5px 15px;">Estas recibiendo este email porque hemos recibido una solicitud de reseteo de contraseña para tu cuenta</p>
-    <p style="padding: 5px 15px;">
-      <a
-         href="${resetPasswordUrl}"
-         style="display: inline-block; padding: 5px 10px; background-color: #673ab7; color: #fff;"
-         title="Resetear contraseña"
-         rel="noopener"
-       >Resetear contraseña</a>
-    </p>
-    <p style="padding: 5px 15px;">Si no solicitaste un reseteo de contraseña, por favor ignora este email</p>
-    <p style="padding: 5px 15px;">Saludos del equipo de Dynamic Blocks</p>
-    <hr/>
-    <p style="padding: 5px 15px;">Si tienes problemas con el botón, copia y pega la siguiente URL en tu navegador:</p>
-    <p style="padding: 5px 15px;">
-      <a
-        href="${resetPasswordUrl}"
-        style="color: #673ab7;"
-        title="Resetear contraseña"
-        rel="noopener"
-        >${resetPasswordUrl}</a>
-    </p>
-    `;
+<h1 style="padding: 5px 15px;">¡Hola!</h1>
+<p style="padding: 5px 15px;">Estas recibiendo este email porque hemos recibido una solicitud de reseteo de contraseña para tu cuenta</p>
+<p style="padding: 5px 15px;">
+  <a
+     href="${resetPasswordUrl}"
+     style="display: inline-block; padding: 5px 10px; background-color: #673ab7; color: #fff;"
+     title="Resetear contraseña"
+     rel="noopener"
+   >Resetear contraseña</a>
+</p>
+<p style="padding: 5px 15px;">Si no solicitaste un reseteo de contraseña, por favor ignora este email</p>
+<p style="padding: 5px 15px;">Saludos del equipo de Dynamic Blocks</p>
+<hr/>
+<p style="padding: 5px 15px;">Si tienes problemas con el botón, copia y pega la siguiente URL en tu navegador:</p>
+<p style="padding: 5px 15px;">
+  <a
+    href="${resetPasswordUrl}"
+    style="color: #673ab7;"
+    title="Resetear contraseña"
+    rel="noopener"
+    >${resetPasswordUrl}</a>
+</p>
+`;
   }
 }
