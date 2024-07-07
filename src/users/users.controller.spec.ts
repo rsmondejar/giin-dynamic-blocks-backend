@@ -2,7 +2,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { PrismaService } from '../../prisma/prisma.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UserBasicInfo } from './interfaces/user-basic-info.interface';
 import { UpdatePasswordUserDto } from './dto/update-password-user.dto';
 
@@ -102,7 +101,7 @@ describe('UsersController', () => {
       const updatePasswordDto: UpdatePasswordUserDto = {
         new_password: password,
         old_password: password,
-      }
+      };
 
       const req = { user: { id: newUser.id } };
 

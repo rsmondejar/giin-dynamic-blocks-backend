@@ -9,21 +9,14 @@ import { UsersModule } from '../users/users.module';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { MailerModule } from '../mailer/mailer.module';
-import { CreateUserDto } from '../users/dto/create-user.dto';
 import { RegistrationStatus } from './interfaces/registration-status.interface';
-import { LoginUserDto } from '../users/dto/login-user.dto';
 import { HttpException } from '@nestjs/common';
-import { SetNewPassword } from '../users/dto/set-new-password.dto';
-import { v4 as uuidv4 } from 'uuid';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
-import { UserBasicInfo } from '../users/interfaces/user-basic-info.interface';
-import { MeStatus } from './interfaces/me-status.interface';
 
 describe('AuthService', () => {
   let service: AuthService;
   let jwtStrategy: JwtStrategy;
   let userService: UsersService;
-  let prisma: PrismaService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -56,7 +49,6 @@ describe('AuthService', () => {
     service = module.get<AuthService>(AuthService);
     jwtStrategy = module.get<JwtStrategy>(JwtStrategy);
     userService = module.get<UsersService>(UsersService);
-    prisma = module.get<PrismaService>(PrismaService);
   });
 
   describe('validate', () => {
