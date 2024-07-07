@@ -34,7 +34,7 @@ export class UsersService {
     });
 
     if (userInDb) {
-      throw new HttpException('user_already_exist', HttpStatus.CONFLICT);
+      throw new HttpException('user_already_exists', HttpStatus.CONFLICT);
     }
     const newUser = await this.prisma.user.create({
       data: {
@@ -116,7 +116,7 @@ export class UsersService {
       },
     });
 
-    if (user.id !== authId && !authUser.isAdmin) {
+    if (user.id !== authId && (!authUser?.isAdmin ?? false)) {
       throw new HttpException(
         'You do not have permissions',
         HttpStatus.FORBIDDEN,
