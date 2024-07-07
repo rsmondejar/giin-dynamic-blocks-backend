@@ -17,12 +17,12 @@ import { SetNewPassword } from '../users/dto/set-new-password.dto';
 import { v4 as uuidv4 } from 'uuid';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { UserBasicInfo } from '../users/interfaces/user-basic-info.interface';
+import { MeStatus } from './interfaces/me-status.interface';
 
 describe('AuthService', () => {
   let service: AuthService;
   let userService: UsersService;
   let prisma: PrismaService;
-  let configService: ConfigService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -55,10 +55,33 @@ describe('AuthService', () => {
     service = module.get<AuthService>(AuthService);
     userService = module.get<UsersService>(UsersService);
     prisma = module.get<PrismaService>(PrismaService);
-    configService = module.get<ConfigService>(ConfigService);
   });
 
   describe('register', () => {
+    it('should return error', async () => {
+      const randomNameSuffix = (Math.random() + 1).toString(36).slice(2, 6);
+
+      const createUserDto: CreateUserDto = {
+        email: `email.${randomNameSuffix}@test.com`,
+        name: `Name ${randomNameSuffix}`,
+        lastName: `Lastname ${randomNameSuffix}`,
+        password: 'password1234',
+      };
+
+      const newUser: RegistrationStatus = await service.register(createUserDto);
+
+      let status: RegistrationStatus = {
+        success: false,
+        message: 'user_already_exists',
+      };
+
+      expect(await service.register(createUserDto)).toEqual(
+        expect.objectContaining(status),
+      );
+
+      await userService.remove({ id: newUser.data.id, authId: newUser.data.id });
+    });
+
     it('should return user', async () => {
       const randomNameSuffix = (Math.random() + 1).toString(36).slice(2, 6);
 
@@ -119,6 +142,17 @@ describe('AuthService', () => {
   });
 
   describe('me', () => {
+    it('should return error', async () => {
+      const user = null;
+      let status: MeStatus = {
+        success: false,
+        message: "Cannot read properties of null (reading 'id')",
+      };
+
+      expect(await service.me(user)).toEqual(
+        expect.objectContaining(status),
+      );
+    });
     it('should return user', async () => {
       const randomNameSuffix = (Math.random() + 1).toString(36).slice(2, 6);
       const newUserInfo = {

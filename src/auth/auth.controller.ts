@@ -85,8 +85,6 @@ export class AuthController {
     const result: SendResetPasswordEmailResponse =
       await this.authService.sendResetPasswordEmail(body.email);
 
-    console.log('result', result);
-
     if (!result.success) {
       throw new HttpException(
         result.message,

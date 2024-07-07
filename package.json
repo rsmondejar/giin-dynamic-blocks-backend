@@ -93,7 +93,8 @@
       "src/main.ts",
       "src/auth/auth.module.ts",
       "src/forms/forms.module.ts",
-      "src/forms-submissions/forms-submissions.module.ts"
+      "src/forms-submissions/forms-submissions.module.ts",
+      "src/users/entities/user.entity.ts"
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"

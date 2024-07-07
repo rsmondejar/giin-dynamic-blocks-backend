@@ -46,7 +46,7 @@ export class AuthService {
     } catch (err) {
       status = {
         success: false,
-        message: err,
+        message: err.message,
       };
     }
     return status;
@@ -127,7 +127,7 @@ export class AuthService {
     } catch (err) {
       status = {
         success: false,
-        message: err,
+        message: err.message,
       };
     }
     return status;
