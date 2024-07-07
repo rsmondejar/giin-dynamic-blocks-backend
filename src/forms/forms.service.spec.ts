@@ -11,7 +11,6 @@ import { v4 as uuidv4 } from 'uuid';
 describe('FormsService', () => {
   let service: FormsService;
   let userService: UsersService;
-  let prisma: PrismaService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -20,7 +19,6 @@ describe('FormsService', () => {
 
     service = module.get<FormsService>(FormsService);
     userService = module.get<UsersService>(UsersService);
-    prisma = module.get<PrismaService>(PrismaService);
   });
 
   describe('findOne', () => {
