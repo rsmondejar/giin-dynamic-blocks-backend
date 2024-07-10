@@ -43,7 +43,13 @@ describe('UsersController', () => {
         MailerModule,
       ],
       controllers: [AuthController],
-      providers: [AuthService, PrismaService, ConfigService, UsersService, MailerService],
+      providers: [
+        AuthService,
+        PrismaService,
+        ConfigService,
+        UsersService,
+        MailerService,
+      ],
     }).compile();
 
     controller = module.get<AuthController>(AuthController);
@@ -62,13 +68,17 @@ describe('UsersController', () => {
         password: uuidv4().toString(),
       };
 
-      const newUser: RegistrationStatus = await controller.register(createUserDto);
+      const newUser: RegistrationStatus =
+        await controller.register(createUserDto);
 
       await expect(controller.register(createUserDto)).rejects.toThrow(
         HttpException,
       );
 
-      await userService.remove({ id: newUser.data.id, authId: newUser.data.id });
+      await userService.remove({
+        id: newUser.data.id,
+        authId: newUser.data.id,
+      });
     });
 
     it('should create a user', async () => {
@@ -80,18 +90,22 @@ describe('UsersController', () => {
         lastName: `Lastname ${randomNameSuffix}`,
       };
 
-      const newUser: RegistrationStatus = await controller.register({ ...newUserInfo, password: uuidv4().toString() });
+      const newUser: RegistrationStatus = await controller.register({
+        ...newUserInfo,
+        password: uuidv4().toString(),
+      });
 
-      let status: RegistrationStatus = {
+      const status: RegistrationStatus = {
         success: true,
         message: 'ACCOUNT_CREATE_SUCCESS',
       };
 
-      expect(newUser).toEqual(
-        expect.objectContaining(status),
-      );
+      expect(newUser).toEqual(expect.objectContaining(status));
 
-      await userService.remove({ id: newUser.data.id, authId: newUser.data.id });
+      await userService.remove({
+        id: newUser.data.id,
+        authId: newUser.data.id,
+      });
     });
 
     describe('login', () => {
@@ -103,7 +117,9 @@ describe('UsersController', () => {
           password: uuidv4().toString(),
         };
 
-        await expect(controller.login(loginUserDto)).rejects.toThrow(HttpException);
+        await expect(controller.login(loginUserDto)).rejects.toThrow(
+          HttpException,
+        );
       });
 
       it('should login user', async () => {
@@ -116,9 +132,10 @@ describe('UsersController', () => {
           password: uuidv4().toString(),
         };
 
-        const newUser: RegistrationStatus = await controller.register(newUserInfo);
+        const newUser: RegistrationStatus =
+          await controller.register(newUserInfo);
 
-        let status: LoginStatus = {
+        const status: LoginStatus = {
           success: true,
           message: 'ACCOUNT_LOGIN_SUCCESS',
         };
@@ -132,7 +149,10 @@ describe('UsersController', () => {
           expect.objectContaining(status),
         );
 
-        await userService.remove({ id: newUser.data.id, authId: newUser.data.id });
+        await userService.remove({
+          id: newUser.data.id,
+          authId: newUser.data.id,
+        });
       });
     });
 
@@ -140,7 +160,7 @@ describe('UsersController', () => {
       it('should return error', async () => {
         const req = {
           user: null,
-        }
+        };
         await expect(controller.me(req)).rejects.toThrow(HttpException);
       });
 
@@ -160,14 +180,14 @@ describe('UsersController', () => {
         const newUser = await userService.create(createUserDto);
         const user = await userService.findByEmail(newUser.email);
 
-        let status: RegistrationStatus = {
+        const status: RegistrationStatus = {
           success: true,
           message: 'ACCOUNT_INFO',
         };
 
         const req = {
           user,
-        }
+        };
 
         expect(await controller.me(req)).toEqual(
           expect.objectContaining(status),
@@ -181,8 +201,10 @@ describe('UsersController', () => {
       it('should return error', async () => {
         const req = {
           email: null,
-        }
-        await expect(controller.sendResetPasswordEmail(req)).rejects.toThrow(HttpException);
+        };
+        await expect(controller.sendResetPasswordEmail(req)).rejects.toThrow(
+          HttpException,
+        );
       });
 
       it('should return success', async () => {
@@ -195,11 +217,12 @@ describe('UsersController', () => {
           password: uuidv4().toString(),
         };
 
-        const newUser: RegistrationStatus = await controller.register(newUserInfo);
+        const newUser: RegistrationStatus =
+          await controller.register(newUserInfo);
 
         const req = {
           email: newUser.data.email,
-        }
+        };
 
         const response: SendResetPasswordEmailResponse = {
           success: true,
@@ -210,7 +233,10 @@ describe('UsersController', () => {
           expect.objectContaining(response),
         );
 
-        await userService.remove({ id: newUser.data.id, authId: newUser.data.id });
+        await userService.remove({
+          id: newUser.data.id,
+          authId: newUser.data.id,
+        });
       });
     });
 
@@ -222,8 +248,10 @@ describe('UsersController', () => {
           email: `email.${randomNameSuffix}@test.com`,
           password: uuidv4().toString(),
           token: null,
-        }
-        await expect(controller.setNewPassword(body)).rejects.toThrow(HttpException);
+        };
+        await expect(controller.setNewPassword(body)).rejects.toThrow(
+          HttpException,
+        );
       });
 
       it('should return user mail token not found', async () => {
@@ -236,17 +264,23 @@ describe('UsersController', () => {
           password: uuidv4().toString(),
         };
 
-        const newUser: RegistrationStatus = await controller.register(newUserInfo);
+        const newUser: RegistrationStatus =
+          await controller.register(newUserInfo);
 
         const body: SetNewPassword = {
           email: newUserInfo.email,
           password: newUserInfo.password,
           token: null,
-        }
+        };
 
-        await expect(controller.setNewPassword(body)).rejects.toThrow(HttpException);
+        await expect(controller.setNewPassword(body)).rejects.toThrow(
+          HttpException,
+        );
 
-        await userService.remove({ id: newUser.data.id, authId: newUser.data.id });
+        await userService.remove({
+          id: newUser.data.id,
+          authId: newUser.data.id,
+        });
       });
 
       it('should return success', async () => {
@@ -259,7 +293,8 @@ describe('UsersController', () => {
           password: uuidv4().toString(),
         };
 
-        const newUser: RegistrationStatus = await controller.register(newUserInfo);
+        const newUser: RegistrationStatus =
+          await controller.register(newUserInfo);
 
         const resetPasswordToken = uuidv4();
 
@@ -275,7 +310,7 @@ describe('UsersController', () => {
           email: newUserInfo.email,
           password: newUserInfo.password,
           token: resetPasswordToken,
-        }
+        };
 
         const response: SetResetPasswordResponse = {
           success: true,
@@ -285,12 +320,14 @@ describe('UsersController', () => {
         const setNewPasswordResponse = await controller.setNewPassword(body);
 
         expect(setNewPasswordResponse).toEqual(
-          expect.objectContaining(response)
+          expect.objectContaining(response),
         );
 
-        await userService.remove({ id: newUser.data.id, authId: newUser.data.id });
+        await userService.remove({
+          id: newUser.data.id,
+          authId: newUser.data.id,
+        });
       });
     });
-
   });
 });

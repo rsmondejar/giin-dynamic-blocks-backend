@@ -12,6 +12,7 @@ import { MailerModule } from '../mailer/mailer.module';
 import { RegistrationStatus } from './interfaces/registration-status.interface';
 import { HttpException } from '@nestjs/common';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
+import { v4 as uuidv4 } from 'uuid';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -59,7 +60,9 @@ describe('AuthService', () => {
         email: `email.${randomNameSuffix}@test.com`,
       };
 
-      await expect(jwtStrategy.validate(payload)).rejects.toThrow(HttpException);
+      await expect(jwtStrategy.validate(payload)).rejects.toThrow(
+        HttpException,
+      );
     });
 
     it('should return user', async () => {
@@ -71,7 +74,10 @@ describe('AuthService', () => {
         lastName: `Lastname ${randomNameSuffix}`,
       };
 
-      const newUser: RegistrationStatus = await service.register({ ...createUserDto, password: uuidv4().toString() });
+      const newUser: RegistrationStatus = await service.register({
+        ...createUserDto,
+        password: uuidv4().toString(),
+      });
 
       const payload: JwtPayload = {
         email: `email.${randomNameSuffix}@test.com`,
@@ -81,7 +87,10 @@ describe('AuthService', () => {
         expect.objectContaining(createUserDto),
       );
 
-      await userService.remove({ id: newUser.data.id, authId: newUser.data.id });
+      await userService.remove({
+        id: newUser.data.id,
+        authId: newUser.data.id,
+      });
     });
   });
 });

@@ -22,7 +22,6 @@ import { MeStatus } from './interfaces/me-status.interface';
 describe('AuthService', () => {
   let service: AuthService;
   let userService: UsersService;
-  let prisma: PrismaService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -54,7 +53,6 @@ describe('AuthService', () => {
 
     service = module.get<AuthService>(AuthService);
     userService = module.get<UsersService>(UsersService);
-    prisma = module.get<PrismaService>(PrismaService);
   });
 
   describe('register', () => {

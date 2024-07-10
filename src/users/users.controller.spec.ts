@@ -4,6 +4,7 @@ import { UsersService } from './users.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { UserBasicInfo } from './interfaces/user-basic-info.interface';
 import { UpdatePasswordUserDto } from './dto/update-password-user.dto';
+import { v4 as uuidv4 } from 'uuid';
 
 describe('UsersController', () => {
   let controller: UsersController;
@@ -22,17 +23,18 @@ describe('UsersController', () => {
   describe('create', () => {
     it('should create a user', async () => {
       const randomNameSuffix = (Math.random() + 1).toString(36).slice(2, 6);
-      const  newUserInfo = {
+      const newUserInfo = {
         email: `email.${randomNameSuffix}@test.com`,
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
-      }
+      };
 
-      const newUser: UserBasicInfo = await controller.create({...newUserInfo, password: uuidv4().toString()});
+      const newUser: UserBasicInfo = await controller.create({
+        ...newUserInfo,
+        password: uuidv4().toString(),
+      });
 
-      expect(newUser).toEqual(
-        expect.objectContaining(newUserInfo),
-      );
+      expect(newUser).toEqual(expect.objectContaining(newUserInfo));
 
       await service.remove({ id: newUser.id, authId: newUser.id });
     });
@@ -48,13 +50,16 @@ describe('UsersController', () => {
   describe('findOne', () => {
     it('should return a user', async () => {
       const randomNameSuffix = (Math.random() + 1).toString(36).slice(2, 6);
-      const  newUserInfo = {
+      const newUserInfo = {
         email: `email.${randomNameSuffix}@test.com`,
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
-      }
+      };
 
-      const newUser: UserBasicInfo = await controller.create({...newUserInfo, password: uuidv4().toString()});
+      const newUser: UserBasicInfo = await controller.create({
+        ...newUserInfo,
+        password: uuidv4().toString(),
+      });
 
       expect(await controller.findOne(newUser.id)).toEqual(
         expect.objectContaining(newUserInfo),
@@ -67,13 +72,16 @@ describe('UsersController', () => {
   describe('remove', () => {
     it('should remove a user', async () => {
       const randomNameSuffix = (Math.random() + 1).toString(36).slice(2, 6);
-      const  newUserInfo = {
+      const newUserInfo = {
         email: `email.${randomNameSuffix}@test.com`,
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
-      }
+      };
 
-      const newUser: UserBasicInfo = await controller.create({...newUserInfo, password: uuidv4().toString()});
+      const newUser: UserBasicInfo = await controller.create({
+        ...newUserInfo,
+        password: uuidv4().toString(),
+      });
 
       const req = { user: { id: newUser.id } };
 
@@ -90,13 +98,16 @@ describe('UsersController', () => {
   describe('updatePassword', () => {
     it('should update user password', async () => {
       const randomNameSuffix = (Math.random() + 1).toString(36).slice(2, 6);
-      const  newUserInfo = {
+      const newUserInfo = {
         email: `email.${randomNameSuffix}@test.com`,
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
-      }
+      };
       const password: string = 'password1234';
-      const newUser: UserBasicInfo = await controller.create({ ...newUserInfo, password: password });
+      const newUser: UserBasicInfo = await controller.create({
+        ...newUserInfo,
+        password: password,
+      });
 
       const updatePasswordDto: UpdatePasswordUserDto = {
         new_password: password,

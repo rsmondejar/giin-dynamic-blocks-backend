@@ -8,6 +8,7 @@ import { HttpException } from '@nestjs/common';
 import { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
 import { UpdatePasswordUserDto } from './dto/update-password-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
+import { v4 as uuidv4 } from 'uuid';
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -44,11 +45,12 @@ describe('UsersService', () => {
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
       };
-      const newUser: UserBasicInfo = await service.create({ ...newUserInfo, password: uuidv4().toString() });
+      const newUser: UserBasicInfo = await service.create({
+        ...newUserInfo,
+        password: uuidv4().toString(),
+      });
 
-      expect(newUser).toEqual(
-        expect.objectContaining(newUserInfo),
-      );
+      expect(newUser).toEqual(expect.objectContaining(newUserInfo));
 
       await service.remove({ id: newUser.id, authId: newUser.id });
     });
@@ -74,7 +76,10 @@ describe('UsersService', () => {
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
       };
-      const newUser: UserBasicInfo = await service.create({ ...newUserInfo, password: uuidv4().toString() });
+      const newUser: UserBasicInfo = await service.create({
+        ...newUserInfo,
+        password: uuidv4().toString(),
+      });
 
       expect(await service.findOne(newUser.id)).toEqual(
         expect.objectContaining(newUserInfo),
@@ -91,8 +96,10 @@ describe('UsersService', () => {
       const fakeUser = {
         email: `email.${randomNameSuffix}@test.com`,
         password: uuidv4().toString(),
-      }
-      await expect(service.findByLogin(fakeUser)).rejects.toThrow(HttpException);
+      };
+      await expect(service.findByLogin(fakeUser)).rejects.toThrow(
+        HttpException,
+      );
     });
 
     it('should return Invalid Credentials', async () => {
@@ -102,10 +109,14 @@ describe('UsersService', () => {
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
       };
-      const newUser: UserBasicInfo = await service.create({ ...newUserInfo, password: uuidv4().toString() });
+      const newUser: UserBasicInfo = await service.create({
+        ...newUserInfo,
+        password: uuidv4().toString(),
+      });
 
-      await expect(service.findByLogin({ email: newUser.email, password: 'error' }))
-        .rejects.toThrow(HttpException);
+      await expect(
+        service.findByLogin({ email: newUser.email, password: 'error' }),
+      ).rejects.toThrow(HttpException);
 
       await service.remove({ id: newUser.id, authId: newUser.id });
     });
@@ -118,7 +129,10 @@ describe('UsersService', () => {
         lastName: `Lastname ${randomNameSuffix}`,
       };
       const password: string = 'password1234';
-      const newUser: UserBasicInfo = await service.create({ ...newUserInfo, password: password });
+      const newUser: UserBasicInfo = await service.create({
+        ...newUserInfo,
+        password: password,
+      });
 
       expect(
         await service.findByLogin({ email: newUser.email, password: password }),
@@ -136,7 +150,10 @@ describe('UsersService', () => {
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
       };
-      const newUser: UserBasicInfo = await service.create({ ...newUserInfo, password: uuidv4().toString() });
+      const newUser: UserBasicInfo = await service.create({
+        ...newUserInfo,
+        password: uuidv4().toString(),
+      });
 
       expect(await service.findByEmail(newUser.email)).toEqual(
         expect.objectContaining(newUserInfo),
@@ -154,7 +171,10 @@ describe('UsersService', () => {
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
       };
-      const newUser: UserBasicInfo = await service.create({ ...newUserInfo, password: uuidv4().toString() });
+      const newUser: UserBasicInfo = await service.create({
+        ...newUserInfo,
+        password: uuidv4().toString(),
+      });
 
       const jwtPayload: JwtPayload = { email: newUser.email };
 
@@ -173,7 +193,9 @@ describe('UsersService', () => {
         new_password: uuidv4().toString(),
         old_password: 'error',
       };
-      await expect(service.updatePassword(payload, fakeUserId)).rejects.toThrow(HttpException);
+      await expect(service.updatePassword(payload, fakeUserId)).rejects.toThrow(
+        HttpException,
+      );
     });
 
     it('should return Invalid Credentials', async () => {
@@ -183,15 +205,19 @@ describe('UsersService', () => {
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
       };
-      const newUser: UserBasicInfo = await service.create({ ...newUserInfo, password: uuidv4().toString() });
+      const newUser: UserBasicInfo = await service.create({
+        ...newUserInfo,
+        password: uuidv4().toString(),
+      });
 
       const payload: UpdatePasswordUserDto = {
         new_password: uuidv4().toString(),
         old_password: 'error',
       };
 
-      await expect(service.updatePassword(payload, newUser.id))
-        .rejects.toThrow(HttpException);
+      await expect(service.updatePassword(payload, newUser.id)).rejects.toThrow(
+        HttpException,
+      );
 
       await service.remove({ id: newUser.id, authId: newUser.id });
     });
@@ -204,7 +230,10 @@ describe('UsersService', () => {
         lastName: `Lastname ${randomNameSuffix}`,
       };
       const password: string = 'password1234';
-      const newUser: UserBasicInfo = await service.create({ ...newUserInfo, password: password });
+      const newUser: UserBasicInfo = await service.create({
+        ...newUserInfo,
+        password: password,
+      });
 
       const payload: UpdatePasswordUserDto = {
         new_password: password,
@@ -222,7 +251,9 @@ describe('UsersService', () => {
   describe('remove', () => {
     it('should return User not found', async () => {
       const fakeUserId: string = new ObjectId().toString();
-      await expect(service.remove({ id: fakeUserId, authId: fakeUserId })).rejects.toThrow(HttpException);
+      await expect(
+        service.remove({ id: fakeUserId, authId: fakeUserId }),
+      ).rejects.toThrow(HttpException);
     });
 
     it('should return do not have permissions', async () => {
@@ -233,9 +264,14 @@ describe('UsersService', () => {
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
       };
-      const newUser: UserBasicInfo = await service.create({ ...newUserInfo, password: uuidv4().toString() });
+      const newUser: UserBasicInfo = await service.create({
+        ...newUserInfo,
+        password: uuidv4().toString(),
+      });
 
-      await expect(service.remove({ id: newUser.id, authId: fakeUserId })).rejects.toThrow(HttpException);
+      await expect(
+        service.remove({ id: newUser.id, authId: fakeUserId }),
+      ).rejects.toThrow(HttpException);
 
       await service.remove({ id: newUser.id, authId: newUser.id });
     });
@@ -247,9 +283,14 @@ describe('UsersService', () => {
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
       };
-      const newUser: UserBasicInfo = await service.create({ ...newUserInfo, password: uuidv4().toString() });
+      const newUser: UserBasicInfo = await service.create({
+        ...newUserInfo,
+        password: uuidv4().toString(),
+      });
 
-      expect(await service.remove({ id: newUser.id, authId: newUser.id })).toEqual(
+      expect(
+        await service.remove({ id: newUser.id, authId: newUser.id }),
+      ).toEqual(
         expect.objectContaining({
           id: newUser.id,
         }),
@@ -265,7 +306,9 @@ describe('UsersService', () => {
         password: uuidv4().toString(),
       };
 
-      const randomNameSuffixForAdminUser = (Math.random() + 1).toString(36).slice(2, 6);
+      const randomNameSuffixForAdminUser = (Math.random() + 1)
+        .toString(36)
+        .slice(2, 6);
       const newUserInfoAdmin = {
         email: `email.${randomNameSuffixForAdminUser}@test.com`,
         name: `Name ${randomNameSuffixForAdminUser}`,
@@ -275,9 +318,12 @@ describe('UsersService', () => {
       };
 
       const newUser: UserBasicInfo = await service.create(newUserInfo);
-      const newUserAdmin: UserBasicInfo = await service.create(newUserInfoAdmin);
+      const newUserAdmin: UserBasicInfo =
+        await service.create(newUserInfoAdmin);
 
-      expect(await service.remove({ id: newUser.id, authId: newUserAdmin.id })).toEqual(
+      expect(
+        await service.remove({ id: newUser.id, authId: newUserAdmin.id }),
+      ).toEqual(
         expect.objectContaining({
           id: newUser.id,
         }),
