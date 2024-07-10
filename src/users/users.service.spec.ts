@@ -128,7 +128,7 @@ describe('UsersService', () => {
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
       };
-      const password: string = 'password1234';
+      const password: string = uuidv4().toString();
       const newUser: UserBasicInfo = await service.create({
         ...newUserInfo,
         password: password,
@@ -229,7 +229,7 @@ describe('UsersService', () => {
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
       };
-      const password: string = 'password1234';
+      const password: string = uuidv4().toString();
       const newUser: UserBasicInfo = await service.create({
         ...newUserInfo,
         password: password,

@@ -103,7 +103,7 @@ describe('UsersController', () => {
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
       };
-      const password: string = 'password1234';
+      const password: string = uuidv4().toString();
       const newUser: UserBasicInfo = await controller.create({
         ...newUserInfo,
         password: password,
