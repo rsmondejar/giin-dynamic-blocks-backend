@@ -94,7 +94,11 @@
       "src/auth/auth.module.ts",
       "src/forms/forms.module.ts",
       "src/forms-submissions/forms-submissions.module.ts",
-      "src/users/entities/user.entity.ts"
+      "src/users/entities/user.entity.ts",
+      "src/forms/dto/create-form.dto.ts",
+      "src/forms/dto/question-option.dto.ts",
+      "src/forms/dto/question.dto.ts",
+      "src/forms-submissions/dto/question-answer.dto.ts"
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
