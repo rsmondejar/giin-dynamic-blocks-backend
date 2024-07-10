@@ -32,7 +32,7 @@ describe('FormsController', () => {
         email: `email.${randomNameSuffix}@test.com`,
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
-        password: 'password1234',
+        password: uuidv4().toString(),
         isAdmin: false,
       };
 
@@ -73,7 +73,7 @@ describe('FormsController', () => {
         email: `email.${randomNameSuffix}@test.com`,
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
-        password: 'password1234',
+        password: uuidv4().toString(),
         isAdmin: false,
       };
 
@@ -110,7 +110,7 @@ describe('FormsController', () => {
         email: `email.${randomNameSuffix}@test.com`,
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
-        password: 'password1234',
+        password: uuidv4().toString(),
         isAdmin: false,
       };
 
@@ -151,7 +151,7 @@ describe('FormsController', () => {
         email: `email.${randomNameSuffix}@test.com`,
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
-        password: 'password1234',
+        password: uuidv4().toString(),
         isAdmin: false,
       };
 
@@ -192,7 +192,7 @@ describe('FormsController', () => {
         email: `email.${randomNameSuffix}@test.com`,
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
-        password: 'password1234',
+        password: uuidv4().toString(),
         isAdmin: false,
       };
 
@@ -245,7 +245,7 @@ describe('FormsController', () => {
         email: `email.${randomNameSuffix}@test.com`,
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
-        password: 'password1234',
+        password: uuidv4().toString(),
         isAdmin: false,
       };
 
@@ -291,7 +291,7 @@ describe('FormsController', () => {
         email: `email.${randomNameSuffix2}@test.com`,
         name: `Name ${randomNameSuffix2}`,
         lastName: `Lastname ${randomNameSuffix2}`,
-        password: 'password1234',
+        password: uuidv4().toString(),
         isAdmin: false,
       };
 

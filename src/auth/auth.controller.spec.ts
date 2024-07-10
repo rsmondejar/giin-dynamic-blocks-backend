@@ -59,12 +59,14 @@ describe('UsersController', () => {
         email: `email.${randomNameSuffix}@test.com`,
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
-        password: 'password1234',
+        password: uuidv4().toString(),
       };
 
       const newUser: RegistrationStatus = await controller.register(createUserDto);
 
-      await expect(controller.register(createUserDto)).rejects.toThrow(HttpException);
+      await expect(controller.register(createUserDto)).rejects.toThrow(
+        HttpException,
+      );
 
       await userService.remove({ id: newUser.data.id, authId: newUser.data.id });
     });
@@ -78,7 +80,7 @@ describe('UsersController', () => {
         lastName: `Lastname ${randomNameSuffix}`,
       };
 
-      const newUser: RegistrationStatus = await controller.register({ ...newUserInfo, password: 'password1234' });
+      const newUser: RegistrationStatus = await controller.register({ ...newUserInfo, password: uuidv4().toString() });
 
       let status: RegistrationStatus = {
         success: true,
@@ -98,7 +100,7 @@ describe('UsersController', () => {
 
         const loginUserDto: LoginUserDto = {
           email: `email.${randomNameSuffix}@test.com`,
-          password: 'password1234',
+          password: uuidv4().toString(),
         };
 
         await expect(controller.login(loginUserDto)).rejects.toThrow(HttpException);
@@ -111,7 +113,7 @@ describe('UsersController', () => {
           email: `email.${randomNameSuffix}@test.com`,
           name: `Name ${randomNameSuffix}`,
           lastName: `Lastname ${randomNameSuffix}`,
-          password: 'password1234',
+          password: uuidv4().toString(),
         };
 
         const newUser: RegistrationStatus = await controller.register(newUserInfo);
@@ -152,7 +154,7 @@ describe('UsersController', () => {
 
         const createUserDto: CreateUserDto = {
           ...newUserInfo,
-          password: 'password1234',
+          password: uuidv4().toString(),
         };
 
         const newUser = await userService.create(createUserDto);
@@ -190,7 +192,7 @@ describe('UsersController', () => {
           email: `email.${randomNameSuffix}@test.com`,
           name: `Name ${randomNameSuffix}`,
           lastName: `Lastname ${randomNameSuffix}`,
-          password: 'password1234',
+          password: uuidv4().toString(),
         };
 
         const newUser: RegistrationStatus = await controller.register(newUserInfo);
@@ -218,7 +220,7 @@ describe('UsersController', () => {
 
         const body: SetNewPassword = {
           email: `email.${randomNameSuffix}@test.com`,
-          password: 'password1234',
+          password: uuidv4().toString(),
           token: null,
         }
         await expect(controller.setNewPassword(body)).rejects.toThrow(HttpException);
@@ -231,7 +233,7 @@ describe('UsersController', () => {
           email: `email.${randomNameSuffix}@test.com`,
           name: `Name ${randomNameSuffix}`,
           lastName: `Lastname ${randomNameSuffix}`,
-          password: 'password1234',
+          password: uuidv4().toString(),
         };
 
         const newUser: RegistrationStatus = await controller.register(newUserInfo);
@@ -254,7 +256,7 @@ describe('UsersController', () => {
           email: `email.${randomNameSuffix}@test.com`,
           name: `Name ${randomNameSuffix}`,
           lastName: `Lastname ${randomNameSuffix}`,
-          password: 'password1234',
+          password: uuidv4().toString(),
         };
 
         const newUser: RegistrationStatus = await controller.register(newUserInfo);

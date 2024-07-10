@@ -58,7 +58,7 @@ describe('FormsService', () => {
       };
       const newUser: UserBasicInfo = await userService.create({
         ...newUserInfo,
-        password: 'password1234',
+        password: uuidv4().toString(),
       });
 
       const createFormDto: CreateFormRequestDto = {
@@ -88,7 +88,7 @@ describe('FormsService', () => {
       };
       const newUser: UserBasicInfo = await userService.create({
         ...newUserInfo,
-        password: 'password1234',
+        password: uuidv4().toString(),
       });
 
       const createFormDto = {
@@ -127,7 +127,7 @@ describe('FormsService', () => {
       };
       const newUser: UserBasicInfo = await userService.create({
         ...newUserInfo,
-        password: 'password1234',
+        password: uuidv4().toString(),
       });
 
       const createFormDto = {
@@ -169,7 +169,7 @@ describe('FormsService', () => {
         email: `email.${randomNameSuffixForAdminUser}@test.com`,
         name: `Name ${randomNameSuffixForAdminUser}`,
         lastName: `Lastname ${randomNameSuffixForAdminUser}`,
-        password: 'password1234',
+        password: uuidv4().toString(),
         isAdmin: true,
       };
 
@@ -195,7 +195,7 @@ describe('FormsService', () => {
         email: `email.${randomNameSuffix}@test.com`,
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
-        password: 'password1234',
+        password: uuidv4().toString(),
         isAdmin: false,
       };
 
@@ -245,7 +245,7 @@ describe('FormsService', () => {
         email: `email.${randomNameSuffix}@test.com`,
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
-        password: 'password1234',
+        password: uuidv4().toString(),
         isAdmin: false,
       };
 
@@ -296,7 +296,7 @@ describe('FormsService', () => {
         email: `email.${randomNameSuffix}@test.com`,
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
-        password: 'password1234',
+        password: uuidv4().toString(),
         isAdmin: false,
       };
 
@@ -327,7 +327,7 @@ describe('FormsService', () => {
         email: `email.${randomNameSuffix}@test.com`,
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
-        password: 'password1234',
+        password: uuidv4().toString(),
         isAdmin: false,
       };
 
@@ -377,7 +377,7 @@ describe('FormsService', () => {
         email: `email.${randomNameSuffix}@test.com`,
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
-        password: 'password1234',
+        password: uuidv4().toString(),
         isAdmin: false,
       };
 
@@ -411,7 +411,7 @@ describe('FormsService', () => {
       email: `email.${randomNameSuffix}@test.com`,
       name: `Name ${randomNameSuffix}`,
       lastName: `Lastname ${randomNameSuffix}`,
-      password: 'password1234',
+      password: uuidv4().toString(),
       isAdmin: false,
     };
 
@@ -516,7 +516,7 @@ describe('FormsService', () => {
         email: `email.${randomNameSuffix}@test.com`,
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
-        password: 'password1234',
+        password: uuidv4().toString(),
         isAdmin: false,
       };
 
@@ -549,7 +549,7 @@ describe('FormsService', () => {
         email: `email.${randomNameSuffix}@test.com`,
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
-        password: 'password1234',
+        password: uuidv4().toString(),
         isAdmin: false,
       };
 
@@ -614,7 +614,7 @@ describe('FormsService', () => {
         email: `email.${randomNameSuffix2}@test.com`,
         name: `Name ${randomNameSuffix2}`,
         lastName: `Lastname ${randomNameSuffix2}`,
-        password: 'password1234',
+        password: uuidv4().toString(),
         isAdmin: false,
       };
 
@@ -672,7 +672,7 @@ describe('FormsService', () => {
         email: `email.${randomNameSuffix}@test.com`,
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
-        password: 'password1234',
+        password: uuidv4().toString(),
         isAdmin: false,
       };
 
@@ -705,7 +705,7 @@ describe('FormsService', () => {
         email: `email.${randomNameSuffix}@test.com`,
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
-        password: 'password1234',
+        password: uuidv4().toString(),
         isAdmin: false,
       };
 
@@ -717,7 +717,7 @@ describe('FormsService', () => {
         email: `email.${randomNameSuffix2}@test.com`,
         name: `Name ${randomNameSuffix2}`,
         lastName: `Lastname ${randomNameSuffix2}`,
-        password: 'password1234',
+        password: uuidv4().toString(),
         isAdmin: false,
       };
 
@@ -755,7 +755,7 @@ describe('FormsService', () => {
         email: `email.${randomNameSuffix}@test.com`,
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
-        password: 'password1234',
+        password: uuidv4().toString(),
         isAdmin: false,
       };
 
@@ -767,7 +767,7 @@ describe('FormsService', () => {
         email: `email.${randomNameSuffix2}@test.com`,
         name: `Name ${randomNameSuffix2}`,
         lastName: `Lastname ${randomNameSuffix2}`,
-        password: 'password1234',
+        password: uuidv4().toString(),
         isAdmin: false,
       };
 
@@ -827,7 +827,7 @@ describe('FormsService', () => {
         email: `email.${randomNameSuffix}@test.com`,
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
-        password: 'password1234',
+        password: uuidv4().toString(),
         isAdmin: false,
       };
 
@@ -839,7 +839,7 @@ describe('FormsService', () => {
         email: `email.${randomNameSuffix2}@test.com`,
         name: `Name ${randomNameSuffix2}`,
         lastName: `Lastname ${randomNameSuffix2}`,
-        password: 'password1234',
+        password: uuidv4().toString(),
         isAdmin: false,
       };
 

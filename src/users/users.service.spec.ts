@@ -28,7 +28,7 @@ describe('UsersService', () => {
         email: `email.${randomNameSuffix}@test.com`,
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
-        password: 'password1234',
+        password: uuidv4().toString(),
       };
       const newUser: UserBasicInfo = await service.create(newUserInfo);
 
@@ -44,7 +44,7 @@ describe('UsersService', () => {
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
       };
-      const newUser: UserBasicInfo = await service.create({ ...newUserInfo, password: 'password1234' });
+      const newUser: UserBasicInfo = await service.create({ ...newUserInfo, password: uuidv4().toString() });
 
       expect(newUser).toEqual(
         expect.objectContaining(newUserInfo),
@@ -74,7 +74,7 @@ describe('UsersService', () => {
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
       };
-      const newUser: UserBasicInfo = await service.create({ ...newUserInfo, password: 'password1234' });
+      const newUser: UserBasicInfo = await service.create({ ...newUserInfo, password: uuidv4().toString() });
 
       expect(await service.findOne(newUser.id)).toEqual(
         expect.objectContaining(newUserInfo),
@@ -90,7 +90,7 @@ describe('UsersService', () => {
 
       const fakeUser = {
         email: `email.${randomNameSuffix}@test.com`,
-        password: 'password1234',
+        password: uuidv4().toString(),
       }
       await expect(service.findByLogin(fakeUser)).rejects.toThrow(HttpException);
     });
@@ -102,7 +102,7 @@ describe('UsersService', () => {
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
       };
-      const newUser: UserBasicInfo = await service.create({ ...newUserInfo, password: 'password1234' });
+      const newUser: UserBasicInfo = await service.create({ ...newUserInfo, password: uuidv4().toString() });
 
       await expect(service.findByLogin({ email: newUser.email, password: 'error' }))
         .rejects.toThrow(HttpException);
@@ -136,7 +136,7 @@ describe('UsersService', () => {
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
       };
-      const newUser: UserBasicInfo = await service.create({ ...newUserInfo, password: 'password1234' });
+      const newUser: UserBasicInfo = await service.create({ ...newUserInfo, password: uuidv4().toString() });
 
       expect(await service.findByEmail(newUser.email)).toEqual(
         expect.objectContaining(newUserInfo),
@@ -154,7 +154,7 @@ describe('UsersService', () => {
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
       };
-      const newUser: UserBasicInfo = await service.create({ ...newUserInfo, password: 'password1234' });
+      const newUser: UserBasicInfo = await service.create({ ...newUserInfo, password: uuidv4().toString() });
 
       const jwtPayload: JwtPayload = { email: newUser.email };
 
@@ -170,7 +170,7 @@ describe('UsersService', () => {
     it('should return User not found', async () => {
       const fakeUserId: string = new ObjectId().toString();
       const payload: UpdatePasswordUserDto = {
-        new_password: 'password1234',
+        new_password: uuidv4().toString(),
         old_password: 'error',
       };
       await expect(service.updatePassword(payload, fakeUserId)).rejects.toThrow(HttpException);
@@ -183,10 +183,10 @@ describe('UsersService', () => {
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
       };
-      const newUser: UserBasicInfo = await service.create({ ...newUserInfo, password: 'password1234' });
+      const newUser: UserBasicInfo = await service.create({ ...newUserInfo, password: uuidv4().toString() });
 
       const payload: UpdatePasswordUserDto = {
-        new_password: 'password1234',
+        new_password: uuidv4().toString(),
         old_password: 'error',
       };
 
@@ -233,7 +233,7 @@ describe('UsersService', () => {
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
       };
-      const newUser: UserBasicInfo = await service.create({ ...newUserInfo, password: 'password1234' });
+      const newUser: UserBasicInfo = await service.create({ ...newUserInfo, password: uuidv4().toString() });
 
       await expect(service.remove({ id: newUser.id, authId: fakeUserId })).rejects.toThrow(HttpException);
 
@@ -247,7 +247,7 @@ describe('UsersService', () => {
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
       };
-      const newUser: UserBasicInfo = await service.create({ ...newUserInfo, password: 'password1234' });
+      const newUser: UserBasicInfo = await service.create({ ...newUserInfo, password: uuidv4().toString() });
 
       expect(await service.remove({ id: newUser.id, authId: newUser.id })).toEqual(
         expect.objectContaining({
@@ -262,7 +262,7 @@ describe('UsersService', () => {
         email: `email.${randomNameSuffix}@test.com`,
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
-        password: 'password1234',
+        password: uuidv4().toString(),
       };
 
       const randomNameSuffixForAdminUser = (Math.random() + 1).toString(36).slice(2, 6);
@@ -270,7 +270,7 @@ describe('UsersService', () => {
         email: `email.${randomNameSuffixForAdminUser}@test.com`,
         name: `Name ${randomNameSuffixForAdminUser}`,
         lastName: `Lastname ${randomNameSuffixForAdminUser}`,
-        password: 'password1234',
+        password: uuidv4().toString(),
         isAdmin: true,
       };
 

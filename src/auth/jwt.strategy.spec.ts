@@ -71,7 +71,7 @@ describe('AuthService', () => {
         lastName: `Lastname ${randomNameSuffix}`,
       };
 
-      const newUser: RegistrationStatus = await service.register({ ...createUserDto, password: 'password1234' });
+      const newUser: RegistrationStatus = await service.register({ ...createUserDto, password: uuidv4().toString() });
 
       const payload: JwtPayload = {
         email: `email.${randomNameSuffix}@test.com`,

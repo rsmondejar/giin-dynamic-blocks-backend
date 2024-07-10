@@ -65,12 +65,12 @@ describe('AuthService', () => {
         email: `email.${randomNameSuffix}@test.com`,
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
-        password: 'password1234',
+        password: uuidv4().toString(),
       };
 
       const newUser: RegistrationStatus = await service.register(createUserDto);
 
-      let status: RegistrationStatus = {
+      const status: RegistrationStatus = {
         success: false,
         message: 'user_already_exists',
       };
@@ -79,7 +79,10 @@ describe('AuthService', () => {
         expect.objectContaining(status),
       );
 
-      await userService.remove({ id: newUser.data.id, authId: newUser.data.id });
+      await userService.remove({
+        id: newUser.data.id,
+        authId: newUser.data.id,
+      });
     });
 
     it('should return user', async () => {
@@ -89,21 +92,22 @@ describe('AuthService', () => {
         email: `email.${randomNameSuffix}@test.com`,
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
-        password: 'password1234',
+        password: uuidv4().toString(),
       };
 
-      let status: RegistrationStatus = {
+      const status: RegistrationStatus = {
         success: true,
         message: 'ACCOUNT_CREATE_SUCCESS',
       };
 
       const newUser: RegistrationStatus = await service.register(createUserDto);
 
-      expect(newUser).toEqual(
-        expect.objectContaining(status),
-      );
+      expect(newUser).toEqual(expect.objectContaining(status));
 
-      await userService.remove({ id: newUser.data.id, authId: newUser.data.id });
+      await userService.remove({
+        id: newUser.data.id,
+        authId: newUser.data.id,
+      });
     });
   });
 
@@ -118,7 +122,7 @@ describe('AuthService', () => {
 
       const createUserDto: CreateUserDto = {
         ...newUserInfo,
-        password: 'password1234',
+        password: uuidv4().toString(),
       };
 
       const newUser: RegistrationStatus = await service.register(createUserDto);
@@ -128,7 +132,7 @@ describe('AuthService', () => {
         password: createUserDto.password,
       };
 
-      let status: RegistrationStatus = {
+      const status: RegistrationStatus = {
         success: true,
         message: 'ACCOUNT_LOGIN_SUCCESS',
       };
@@ -137,21 +141,22 @@ describe('AuthService', () => {
         expect.objectContaining(status),
       );
 
-      await userService.remove({ id: newUser.data.id, authId: newUser.data.id });
+      await userService.remove({
+        id: newUser.data.id,
+        authId: newUser.data.id,
+      });
     });
   });
 
   describe('me', () => {
     it('should return error', async () => {
       const user = null;
-      let status: MeStatus = {
+      const status: MeStatus = {
         success: false,
         message: "Cannot read properties of null (reading 'id')",
       };
 
-      expect(await service.me(user)).toEqual(
-        expect.objectContaining(status),
-      );
+      expect(await service.me(user)).toEqual(expect.objectContaining(status));
     });
     it('should return user', async () => {
       const randomNameSuffix = (Math.random() + 1).toString(36).slice(2, 6);
@@ -163,20 +168,18 @@ describe('AuthService', () => {
 
       const createUserDto: CreateUserDto = {
         ...newUserInfo,
-        password: 'password1234',
+        password: uuidv4().toString(),
       };
 
       const newUser = await userService.create(createUserDto);
       const user = await userService.findByEmail(newUser.email);
 
-      let status: RegistrationStatus = {
+      const status: RegistrationStatus = {
         success: true,
         message: 'ACCOUNT_INFO',
       };
 
-      expect(await service.me(user)).toEqual(
-        expect.objectContaining(status),
-      );
+      expect(await service.me(user)).toEqual(expect.objectContaining(status));
 
       await userService.remove({ id: newUser.id, authId: newUser.id });
     });
@@ -188,11 +191,11 @@ describe('AuthService', () => {
 
       const setNewPassword: SetNewPassword = {
         email: `email.${randomNameSuffix}@test.com`,
-        password: 'password1234',
+        password: uuidv4().toString(),
         token: 'token',
       };
 
-      let status: RegistrationStatus = {
+      const status: RegistrationStatus = {
         success: false,
         message: 'USER_NOT_FOUND',
       };
@@ -217,9 +220,12 @@ describe('AuthService', () => {
         token: 'token',
       };
 
-      const newUser = await userService.create({ ...newUserInfo, password: password });
+      const newUser = await userService.create({
+        ...newUserInfo,
+        password: password,
+      });
 
-      let status: RegistrationStatus = {
+      const status: RegistrationStatus = {
         success: false,
         message: 'USER_MAIL_TOKEN_NOT_FOUND',
       };
@@ -237,18 +243,12 @@ describe('AuthService', () => {
         email: `email.${randomNameSuffix}@test.com`,
         name: `Name ${randomNameSuffix}`,
         lastName: `Lastname ${randomNameSuffix}`,
-        password: 'password1234',
+        password: uuidv4().toString(),
       };
 
       const newUser = await userService.create(newUserInfo);
 
-      let resetPasswordToken = uuidv4();
-      const newPasswordReset = await prisma.passwordReset.create({
-        data: {
-          email: newUserInfo.email,
-          token: resetPasswordToken,
-        },
-      });
+      const resetPasswordToken = uuidv4();
 
       const setNewPassword: SetNewPassword = {
         email: newUserInfo.email,
@@ -256,7 +256,7 @@ describe('AuthService', () => {
         token: resetPasswordToken,
       };
 
-      let status: RegistrationStatus = {
+      const status: RegistrationStatus = {
         success: true,
         message: 'SET_NEW_PASSWORD_SUCCESS',
       };
@@ -264,12 +264,6 @@ describe('AuthService', () => {
       expect(await service.setNewPassword(setNewPassword)).toEqual(
         expect.objectContaining(status),
       );
-
-      // await prisma.passwordReset.delete({
-      //   where: {
-      //     id: newPasswordReset.id,
-      //   },
-      // });
 
       await userService.remove({ id: newUser.id, authId: newUser.id });
     });
@@ -280,7 +274,9 @@ describe('AuthService', () => {
         const payload: JwtPayload = {
           email: `email.${randomNameSuffix}@test.com`,
         };
-        await expect(service.validateUser(payload)).rejects.toThrow(HttpException);
+        await expect(service.validateUser(payload)).rejects.toThrow(
+          HttpException,
+        );
       });
 
       it('should return user', async () => {
@@ -291,7 +287,10 @@ describe('AuthService', () => {
           lastName: `Lastname ${randomNameSuffix}`,
         };
 
-        const newUser: UserBasicInfo = await userService.create({ ...newUserInfo, password: 'password1234' });
+        const newUser: UserBasicInfo = await userService.create({
+          ...newUserInfo,
+          password: uuidv4().toString(),
+        });
         const payload: JwtPayload = {
           email: newUser.email,
         };
@@ -300,43 +299,5 @@ describe('AuthService', () => {
         );
       });
     });
-
-//     describe('emailTemplate', () => {
-//       it('should return email template', async () => {
-//         const token: string = 'token';
-//         const email: string = "email@email.com"
-//         const frontendUrl = configService.get<string>('FRONTEND_URL');
-//         const resetPasswordUrl = `${frontendUrl}/password/reset/${token}?email=${email}`;
-//         const response: string = `
-// <h1 style="padding: 5px 15px;">¡Hola!</h1>
-// <p style="padding: 5px 15px;">Estas recibiendo este email porque hemos recibido una solicitud de reseteo de contraseña para tu cuenta</p>
-// <p style="padding: 5px 15px;">
-//   <a
-//      href="${resetPasswordUrl}"
-//      style="display: inline-block; padding: 5px 10px; background-color: #673ab7; color: #fff;"
-//      title="Resetear contraseña"
-//      rel="noopener"
-//    >Resetear contraseña</a>
-// </p>
-// <p style="padding: 5px 15px;">Si no solicitaste un reseteo de contraseña, por favor ignora este email</p>
-// <p style="padding: 5px 15px;">Saludos del equipo de Dynamic Blocks</p>
-// <hr/>
-// <p style="padding: 5px 15px;">Si tienes problemas con el botón, copia y pega la siguiente URL en tu navegador:</p>
-// <p style="padding: 5px 15px;">
-//   <a
-//     href="${resetPasswordUrl}"
-//     style="color: #673ab7;"
-//     title="Resetear contraseña"
-//     rel="noopener"
-//     >${resetPasswordUrl}</a>
-// </p>
-// `;
-//
-//
-//         expect(service.emailTemplate(token, email)).toBe(
-//           response,
-//         );
-//       });
-//     });
   });
 });

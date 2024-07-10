@@ -28,7 +28,7 @@ describe('UsersController', () => {
         lastName: `Lastname ${randomNameSuffix}`,
       }
 
-      const newUser: UserBasicInfo = await controller.create({...newUserInfo, password: 'password1234'});
+      const newUser: UserBasicInfo = await controller.create({...newUserInfo, password: uuidv4().toString()});
 
       expect(newUser).toEqual(
         expect.objectContaining(newUserInfo),
@@ -54,7 +54,7 @@ describe('UsersController', () => {
         lastName: `Lastname ${randomNameSuffix}`,
       }
 
-      const newUser: UserBasicInfo = await controller.create({...newUserInfo, password: 'password1234'});
+      const newUser: UserBasicInfo = await controller.create({...newUserInfo, password: uuidv4().toString()});
 
       expect(await controller.findOne(newUser.id)).toEqual(
         expect.objectContaining(newUserInfo),
@@ -73,7 +73,7 @@ describe('UsersController', () => {
         lastName: `Lastname ${randomNameSuffix}`,
       }
 
-      const newUser: UserBasicInfo = await controller.create({...newUserInfo, password: 'password1234'});
+      const newUser: UserBasicInfo = await controller.create({...newUserInfo, password: uuidv4().toString()});
 
       const req = { user: { id: newUser.id } };
 

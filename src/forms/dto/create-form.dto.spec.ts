@@ -25,6 +25,5 @@ describe('CreateFormDto', () => {
         isPublished: true,
       }),
     );
-    // await expect(service.findOne('id-error')).rejects.toThrow(HttpException);
   });
 });

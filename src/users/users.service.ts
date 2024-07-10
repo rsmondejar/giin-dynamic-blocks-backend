@@ -116,7 +116,7 @@ export class UsersService {
       },
     });
 
-    if (user.id !== authId && (!authUser?.isAdmin ?? false)) {
+    if (user.id !== authId && !authUser?.isAdmin) {
       throw new HttpException(
         'You do not have permissions',
         HttpStatus.FORBIDDEN,
