@@ -31,9 +31,7 @@ export class FormsService {
       const form = await this.prisma.form.findFirst({
         where: {
           id: id,
-          deletedAt: {
-            isSet: false,
-          },
+          OR: [{ deletedAt: { isSet: false } }, { deletedAt: null }],
         },
       });
 
@@ -144,14 +142,55 @@ export class FormsService {
     // If user is admin, get all forms.
     if (user.isAdmin) {
       return this.prisma.form.findMany({
-        orderBy: [{ createdAt: 'desc' }],
-        include: {
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          description: true,
+          isPublished: true,
+          createdAt: true,
+          author: {
+            select: {
+              id: true,
+              name: true,
+              lastName: true,
+            },
+          },
+          formsRoles: {
+            select: {
+              role: {
+                select: {
+                  id: true,
+                  name: true,
+                  type: true,
+                },
+              },
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                  lastName: true,
+                  email: true,
+                },
+              },
+            },
+          },
+          questions: {
+            select: {
+              id: true,
+            },
+          },
           _count: {
             select: {
               formSubmission: true,
+              formsRoles: true,
             },
           },
         },
+        where: {
+          OR: [{ deletedAt: { isSet: false } }, { deletedAt: null }],
+        },
+        orderBy: [{ createdAt: 'desc' }],
       });
     }
 
@@ -190,6 +229,11 @@ export class FormsService {
             },
           },
         },
+        questions: {
+          select: {
+            id: true,
+          },
+        },
         _count: {
           select: {
             formSubmission: true,
@@ -198,9 +242,7 @@ export class FormsService {
         },
       },
       where: {
-        deletedAt: {
-          isSet: false,
-        },
+        OR: [{ deletedAt: { isSet: false } }, { deletedAt: null }],
         formsRoles: {
           some: {
             userId: user.id,
@@ -216,9 +258,7 @@ export class FormsService {
       where: {
         slug: slug,
         isPublished: true,
-        deletedAt: {
-          isSet: false,
-        },
+        OR: [{ deletedAt: { isSet: false } }, { deletedAt: null }],
       },
       select: {
         id: true,
@@ -293,10 +333,73 @@ export class FormsService {
     }
   }
 
+  async restore({ formId, userId }) {
+    try {
+      if (!this.isValidObjectId(formId)) {
+        throw new HttpException('Invalid form id', HttpStatus.BAD_REQUEST);
+      }
+
+      const formExits = await this.prisma.form.findFirst({
+        where: {
+          id: formId,
+          OR: [{ deletedAt: { isSet: true } }, { deletedAt: null }],
+        },
+      });
+
+      if (!formExits) {
+        throw new HttpException(
+          'Form not found does not have permissions',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      // Check if user has permissions to restore form.
+      if (!(await this.checkIfUserHasPermissionsToRestoreForm(userId))) {
+        throw new HttpException(
+          'User does not have permissions to restore form',
+          HttpStatus.FORBIDDEN,
+        );
+      }
+
+      const formRestored = await this.prisma.form.update({
+        where: {
+          id: formId,
+        },
+        data: {
+          updatedAt: new Date(),
+          deletedAt: null,
+        },
+        select: {
+          id: true,
+          deletedAt: true,
+        },
+      });
+
+      await this.prisma.audit.create({
+        data: {
+          action: 'restore',
+          entity: 'form',
+          entityId: formRestored.id,
+          userId: userId,
+          detail: formRestored,
+        },
+      });
+
+      return formRestored;
+    } catch (error) {
+      throw new HttpException(
+        error.message,
+        error.status ?? HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   async checkIfUserHasPermissionsToDeleteForm(
     formId: string,
     userId: string,
   ): Promise<boolean> {
+    const isAdmin = await this.checkIfUserIsAdmin(userId);
+
     const formRoles = await this.prisma.formUserRoles.findFirst({
       where: {
         formId: formId,
@@ -306,7 +409,24 @@ export class FormsService {
         },
       },
     });
-    return !!formRoles;
+    return isAdmin || !!formRoles;
+  }
+
+  async checkIfUserHasPermissionsToRestoreForm(
+    userId: string,
+  ): Promise<boolean> {
+    return await this.checkIfUserIsAdmin(userId);
+  }
+
+  async checkIfUserIsAdmin(userId: string): Promise<boolean> {
+    const isAdmin = await this.prisma.user.findFirst({
+      where: {
+        id: userId,
+        isAdmin: true,
+      },
+    });
+
+    return !!isAdmin;
   }
 
   async submissionsExportExcel(id: string, authId: string) {
@@ -318,15 +438,15 @@ export class FormsService {
       const form = await this.prisma.form.findFirst({
         where: {
           id: id,
-          deletedAt: {
-            isSet: false,
-          },
+          OR: [{ deletedAt: { isSet: false } }, { deletedAt: null }],
         },
       });
 
       if (!form) {
         throw new HttpException('Form not found', HttpStatus.NOT_FOUND);
       }
+
+      const isAdmin = await this.checkIfUserIsAdmin(authId);
 
       // Check if user has permissions to export form submissions
       const userRole = await this.prisma.formUserRoles.findFirst({
@@ -336,7 +456,7 @@ export class FormsService {
         },
       });
 
-      if (!userRole) {
+      if (!isAdmin && !userRole) {
         throw new HttpException(
           'User does not have permissions to export form submissions',
           HttpStatus.FORBIDDEN,

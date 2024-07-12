@@ -9,7 +9,7 @@ import {
   Get,
   Param,
   Res,
-  Header,
+  Header, Put,
 } from '@nestjs/common';
 import { FormsService } from './forms.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -65,6 +65,17 @@ export class FormsController {
   @Delete(':id')
   async remove(@Param('id') id: string, @Request() req) {
     return await this.formsService.delete({
+      formId: id,
+      userId: req.user.id,
+    });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiSecurity('access-key')
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Put(':id/restore')
+  async restore(@Param('id') id: string, @Request() req) {
+    return await this.formsService.restore({
       formId: id,
       userId: req.user.id,
     });
