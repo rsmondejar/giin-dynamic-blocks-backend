@@ -355,6 +355,93 @@ describe('FormsService', () => {
     });
   });
 
+  describe('restore', () => {
+    it('should return error invalid form id', async () => {
+      await expect(
+        service.delete({
+          formId: 'id-error',
+          userId: 'id-error',
+        }),
+      ).rejects.toThrow(HttpException);
+    });
+
+    it('should return error form not found', async () => {
+      await expect(
+        service.restore({
+          formId: new ObjectId().toString(),
+          userId: new ObjectId().toString(),
+        }),
+      ).rejects.toThrow(HttpException);
+    });
+
+    it('should return error form not found', async () => {
+      const randomNameSuffix = (Math.random() + 1).toString(36).slice(2, 6);
+      const newUserInfo = {
+        email: `email.${randomNameSuffix}@test.com`,
+        name: `Name ${randomNameSuffix}`,
+        lastName: `Lastname ${randomNameSuffix}`,
+        password: uuidv4().toString(),
+        isAdmin: false,
+      };
+
+      const newUser = await userService.create(newUserInfo);
+
+      const createFormDto = {
+        title: `Test title ${randomNameSuffix}`,
+        description: `Test description ${randomNameSuffix}`,
+        authorId: newUser.id,
+        questions: [],
+      };
+
+      const form = await service.create(createFormDto);
+
+      await expect(
+        service.restore({
+          formId: form.id,
+          userId: new ObjectId().toString(),
+        }),
+      ).rejects.toThrow(HttpException);
+
+      await service.delete({ formId: form.id, userId: newUser.id });
+    });
+
+    it('should restore a form', async () => {
+      const randomNameSuffix = (Math.random() + 1).toString(36).slice(2, 6);
+      const newUserInfo = {
+        email: `email.${randomNameSuffix}@test.com`,
+        name: `Name ${randomNameSuffix}`,
+        lastName: `Lastname ${randomNameSuffix}`,
+        password: uuidv4().toString(),
+        isAdmin: true,
+      };
+
+      const newUser = await userService.create(newUserInfo);
+
+      const user = await userService.findByPayload({ email: newUser.email });
+
+      const createFormDto = {
+        title: `Test title ${randomNameSuffix}`,
+        description: `Test description ${randomNameSuffix}`,
+        authorId: user.id,
+        questions: [],
+      };
+
+      const form = await service.create(createFormDto);
+
+      await service.delete({ formId: form.id, userId: newUser.id });
+
+      expect(
+        await service.restore({
+          formId: form.id,
+          userId: newUser.id,
+        }),
+      ).toEqual(expect.objectContaining({ id: form.id }));
+
+      await service.delete({ formId: form.id, userId: newUser.id });
+      await userService.remove({ id: newUser.id, authId: newUser.id });
+    });
+  });
+
   describe('submissionsExportExcel', () => {
     it('should return error invalid form id', async () => {
       await expect(

@@ -18,6 +18,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { UserBasicInfo } from '../users/interfaces/user-basic-info.interface';
 import { MeStatus } from './interfaces/me-status.interface';
+import { SendResetPasswordEmailResponse } from './interfaces/send-reset-password-email-response.interface';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -183,6 +184,46 @@ describe('AuthService', () => {
     });
   });
 
+  describe('sendResetPasswordEmail', () => {
+    it('should return User not found', async () => {
+      const randomNameSuffix = (Math.random() + 1).toString(36).slice(2, 6);
+
+      const email: string = `email.${randomNameSuffix}@test.com`;
+
+      const status: SendResetPasswordEmailResponse = {
+        success: false,
+        message: 'USER_NOT_FOUND',
+      };
+
+      expect(await service.sendResetPasswordEmail(email)).toEqual(
+        expect.objectContaining(status),
+      );
+    });
+
+    it('should return ok', async () => {
+      const randomNameSuffix = (Math.random() + 1).toString(36).slice(2, 6);
+      const newUserInfo = {
+        email: `email.${randomNameSuffix}@test.com`,
+        name: `Name ${randomNameSuffix}`,
+        lastName: `Lastname ${randomNameSuffix}`,
+        password: uuidv4().toString(),
+      };
+
+      const newUser = await userService.create(newUserInfo);
+
+      const status: SendResetPasswordEmailResponse = {
+        success: true,
+        message: 'PASSWORD_RESET_EMAIL_SENT',
+      };
+
+      expect(await service.sendResetPasswordEmail(newUserInfo.email)).toEqual(
+        expect.objectContaining(status),
+      );
+
+      await userService.remove({ id: newUser.id, authId: newUser.id });
+    });
+  });
+
   describe('setNewPassword', () => {
     it('should return User not found', async () => {
       const randomNameSuffix = (Math.random() + 1).toString(36).slice(2, 6);
@@ -246,12 +287,13 @@ describe('AuthService', () => {
 
       const newUser = await userService.create(newUserInfo);
 
-      const resetPasswordToken = uuidv4();
+      const statusResetPasswordEmailResponse: SendResetPasswordEmailResponse =
+        await service.sendResetPasswordEmail(newUser.email);
 
       const setNewPassword: SetNewPassword = {
         email: newUserInfo.email,
         password: newUserInfo.password,
-        token: resetPasswordToken,
+        token: statusResetPasswordEmailResponse.data.token,
       };
 
       const status: RegistrationStatus = {

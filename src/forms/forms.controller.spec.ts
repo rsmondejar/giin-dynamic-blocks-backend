@@ -7,6 +7,7 @@ import { UsersService } from '../users/users.service';
 import { AddPermissionDto } from './dto/add-permission.dto';
 import { RemovePermissionDto } from './dto/remove-permission.dto';
 import { Response } from 'express';
+import { v4 as uuidv4 } from 'uuid';
 
 describe('FormsController', () => {
   let controller: FormsController;
@@ -176,6 +177,87 @@ describe('FormsController', () => {
           title: form.title,
           description: form.description,
           slug: form.slug,
+        }),
+      );
+
+      await controller.remove(form.id, req);
+      await userService.remove({ id: newUser.id, authId: newUser.id });
+    });
+  });
+
+  describe('remove', () => {
+    it('should return ok', async () => {
+      const randomNameSuffix = (Math.random() + 1).toString(36).slice(2, 6);
+
+      const newUserInfo = {
+        email: `email.${randomNameSuffix}@test.com`,
+        name: `Name ${randomNameSuffix}`,
+        lastName: `Lastname ${randomNameSuffix}`,
+        password: uuidv4().toString(),
+        isAdmin: false,
+      };
+
+      const newUser = await userService.create(newUserInfo);
+
+      const createFormDto: CreateFormRequestDto = {
+        title: `Title ${randomNameSuffix}`,
+        description: `Description ${randomNameSuffix}`,
+        questions: [],
+      };
+
+      const req = {
+        user: {
+          id: newUser.id,
+        },
+      };
+
+      const form = await controller.create(createFormDto, req);
+
+      expect(await controller.remove(form.id, req)).toEqual(
+        expect.objectContaining({
+          id: form.id,
+          deletedAt: expect.any(Date),
+        }),
+      );
+
+      await userService.remove({ id: newUser.id, authId: newUser.id });
+    });
+  });
+
+  describe('restore', () => {
+    it('should return ok', async () => {
+      const randomNameSuffix = (Math.random() + 1).toString(36).slice(2, 6);
+
+      const newUserInfo = {
+        email: `email.${randomNameSuffix}@test.com`,
+        name: `Name ${randomNameSuffix}`,
+        lastName: `Lastname ${randomNameSuffix}`,
+        password: uuidv4().toString(),
+        isAdmin: true,
+      };
+
+      const newUser = await userService.create(newUserInfo);
+
+      const createFormDto: CreateFormRequestDto = {
+        title: `Title ${randomNameSuffix}`,
+        description: `Description ${randomNameSuffix}`,
+        questions: [],
+      };
+
+      const req = {
+        user: {
+          id: newUser.id,
+        },
+      };
+
+      const form = await controller.create(createFormDto, req);
+
+      await controller.remove(form.id, req);
+
+      expect(await controller.restore(form.id, req)).toEqual(
+        expect.objectContaining({
+          id: form.id,
+          deletedAt: null,
         }),
       );
 

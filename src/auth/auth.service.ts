@@ -79,6 +79,7 @@ export class AuthService {
         email: user.email,
         name: user.name,
         lastName: user.lastName,
+        isAdmin: user.isAdmin,
         createdAt: user.createdAt,
       };
 
@@ -121,7 +122,7 @@ export class AuthService {
         email: user.email,
         name: user.name,
         lastName: user.lastName,
-        // token: user.token,
+        isAdmin: user.isAdmin,
         createdAt: user.createdAt,
       };
     } catch (err) {
@@ -167,6 +168,11 @@ export class AuthService {
             token: resetPasswordToken,
           },
         });
+
+        status.data = {
+          email: email,
+          token: resetPasswordToken,
+        };
       }
 
       const options: SendEmailDto = {
