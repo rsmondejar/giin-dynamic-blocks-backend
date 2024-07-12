@@ -187,9 +187,6 @@ export class FormsService {
             },
           },
         },
-        where: {
-          OR: [{ deletedAt: { isSet: false } }, { deletedAt: null }],
-        },
         orderBy: [{ createdAt: 'desc' }],
       });
     }
