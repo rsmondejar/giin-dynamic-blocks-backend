@@ -149,6 +149,7 @@ export class FormsService {
           description: true,
           isPublished: true,
           createdAt: true,
+          deletedAt: true,
           author: {
             select: {
               id: true,
